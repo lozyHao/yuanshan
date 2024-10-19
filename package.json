@@ -1,0 +1,38 @@
+{
+  "name": "yuanshan",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@unocss/reset": "^0.63.4",
+    "less": "^4.2.0",
+    "less-loader": "^12.2.0",
+    "pinia": "^2.2.4",
+    "pinia-plugin-persistedstate": "^4.1.1",
+    "unplugin-auto-import": "^0.18.3",
+    "unplugin-vue-components": "^0.27.4",
+    "vue": "^3.5.10",
+    "vue-router": "^4.4.5"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.13.0",
+    "@types/node": "^22.7.7",
+    "@unocss/eslint-config": "^0.63.4",
+    "@vicons/tabler": "^0.12.0",
+    "@vitejs/plugin-vue": "^5.1.4",
+    "eslint": "^9.13.0",
+    "eslint-plugin-vue": "^9.29.0",
+    "globals": "^15.11.0",
+    "naive-ui": "^2.40.1",
+    "typescript": "^5.5.3",
+    "typescript-eslint": "^8.10.0",
+    "unocss": "^0.63.4",
+    "vite": "^5.4.8",
+    "vue-tsc": "^2.1.6"
+  }
+}
