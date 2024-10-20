@@ -6,12 +6,15 @@ import { useThemeStore } from './store/theme';
 const store = useThemeStore();
 const themeStore = store.theme
 
-const theme = computed(() => themeStore)
+const theme = computed(() => {
+	store.setBodyClass()
+	return themeStore
+})
 </script>
 
 <template>
 	<n-config-provider :theme="theme">
-		<div id="app">
+		<div id="app-content" class="bg-color15">
 			<router-view></router-view>
 		</div>
 	</n-config-provider>

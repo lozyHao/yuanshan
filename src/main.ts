@@ -1,4 +1,6 @@
-import './style.css'
+import '@/assets/styles/main.less'
+import '@/assets/styles/common.less'
+
 
 import App from './App.vue'
 import { createApp } from 'vue'

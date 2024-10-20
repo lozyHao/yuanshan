@@ -1,0 +1,150 @@
+// 全局通用公共样式切换
+.styleChangePop(@theme) {
+  @color-fff: "color-fff-@{theme}";
+  @color-eee: "color-eee-@{theme}";
+  @color-ddd: "color-ddd-@{theme}";
+  @color-aaa: "color-aaa-@{theme}";
+  @color-999: "color-999-@{theme}";
+  @color-666: "color-666-@{theme}";
+  @color-333: "color-333-@{theme}";
+  @color-111: "color-111-@{theme}";
+  @color-000: "color-000-@{theme}";
+
+  @color-opacity1-fff: "color-opacity1-fff-@{theme}";
+  @color-opacity2-fff: "color-opacity2-fff-@{theme}";
+  @color-opacity3-fff: "color-opacity3-fff-@{theme}";
+  @color-opacity4-fff: "color-opacity4-fff-@{theme}";
+
+  @color-opacity1-000: "color-opacity1-000-@{theme}";
+  @color-opacity2-000: "color-opacity2-000-@{theme}";
+  @color-opacity3-000: "color-opacity3-000-@{theme}";
+  @color-opacity4-000: "color-opacity4-000-@{theme}";
+
+  @color-F0F0CC: "color-F0F0CC-@{theme}";
+  @color-EEE4B3: "color-EEE4B3-@{theme}";
+  @color-BE4E16: "color-BE4E16-@{theme}";
+  @color-307872: "color-307872-@{theme}";
+  @color-013D3A: "color-013D3A-@{theme}";
+  @color-00181E: "color-00181E-@{theme}";
+
+  @color-success: "color-success-@{theme}";
+  @color-info: "color-info-@{theme}";
+  @color-error: "color-error-@{theme}";
+  @color-warning: "color-warning-@{theme}";
+
+  //   文本颜色
+  //   颜色集1
+  .color0 {
+    color: @@color-000;
+  }
+  .color1 {
+    color: @@color-111;
+  }
+  .color3 {
+    color: @@color-333;
+  }
+  .color6 {
+    color: @@color-666;
+  }
+  .color9 {
+    color: @@color-999;
+  }
+  .color12 {
+    color: @@color-aaa;
+  }
+  .color13 {
+    color: @@color-ddd;
+  }
+  .color15 {
+    color: @@color-eee;
+  }
+  .color16 {
+    color: @@color-fff;
+  }
+  //   颜色集2
+  .color-F0F0CC {
+    color: @@color-F0F0CC;
+  }
+  .color-EEE4B3 {
+    color: @@color-EEE4B3;
+  }
+  .color-BE4E16 {
+    color: @@color-BE4E16;
+  }
+  .color-307872 {
+    color: @@color-307872;
+  }
+  .color-013D3A {
+    color: @@color-013D3A;
+  }
+  .color-00181E {
+    color: @@color-00181E;
+  }
+  //   颜色集3
+  .color-success {
+    color: @@color-success;
+  }
+  .color-info {
+    color: @@color-info;
+  }
+  .color-error {
+    color: @@color-error;
+  }
+  .color-warning {
+    color: @@color-warning;
+  }
+
+  //  背景颜色
+  .bg-color9 {
+    background: @@color-999;
+  }
+  .bg-color15 {
+    background: @@color-eee;
+  }
+  .bg-color16 {
+    background: @@color-fff;
+  }
+
+  //   背景透明度
+  .bg-opacity1-fff {
+    background: @@color-opacity1-fff;
+  }
+  .bg-opacity2-fff {
+    background: @@color-opacity2-fff;
+  }
+  .bg-opacity3-fff {
+    background: @@color-opacity3-fff;
+  }
+  .bg-opacity4-fff {
+    background: @@color-opacity4-fff;
+  }
+
+  // border 颜色
+  .border-color15 {
+    border-color: @@color-eee;
+  }
+  .border-color3 {
+    border-color: @@color-333;
+  }
+
+  // 弹出层
+  .pop-bg {
+    background: @@color-eee !important;
+    border-radius: 12px !important;
+    padding: 12px !important;
+  }
+
+  // 自定义菜单按钮悬浮效果
+  .menu-hover {
+    &:hover {
+      background: @@color-ddd;
+    }
+  }
+}
+.body-dark {
+  .styleChangePop(dark);
+}
+
+.body-light {
+  .styleChangePop(light);
+}

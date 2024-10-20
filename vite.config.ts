@@ -29,9 +29,17 @@ export default defineConfig({
 			resolvers: [NaiveUiResolver()]
 		})
 	],
+	css: {
+		preprocessorOptions: {
+			less: {
+				additionalData: '@import "@/assets/styles/theme.less";',
+				javascriptEnabled: true,
+			},
+		},
+	},
 	resolve: {
 		alias: {
 			'@': path.resolve(__dirname, './src'), // 配置 @ 指向 src 目录
 		},
-	},
+	}
 })
