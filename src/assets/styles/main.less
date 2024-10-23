@@ -10,6 +10,11 @@ html {
   height: 100vh;
   width: 100vw;
   overflow: hidden;
+  //   禁用用户选择
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 #app {
@@ -48,4 +53,46 @@ html {
       background: rgba(0, 0, 0, 0.1);
     }
   }
+}
+
+#default-layout {
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+
+  // 自定义滚动条样式
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  &::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+    border-radius: 0;
+    background: rgba(0, 0, 0, 0.1);
+  }
+}
+
+// 抽屉
+.n-drawer.n-drawer--bottom-placement {
+  overflow: hidden;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+}
+.n-tabs .n-tabs-tab {
+  padding: 0 0 8px;
+
+  .n-tabs-tab__label {
+    font-weight: bold;
+  }
+}
+.n-tabs-bar {
+  height: 4px !important;
+  border-radius: 2px !important;
 }

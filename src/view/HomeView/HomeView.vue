@@ -1,16 +1,14 @@
 <script lang="ts" setup>
 import NavBar from './components/NavBar.vue';
 import StartBox from './components/StartBox.vue';
-import OptionBox from './components/OptionBox.vue';
 
 </script>
 <template>
 	<div class="home">
 		<div class="shade"></div>
-		<div class="w-full h-full relative flex flex-col justify-between items-center">
+		<div class="w-full h-full relative flex flex-col items-center">
 			<nav-bar class="position-relative" />
 			<start-box></start-box>
-			<option-box></option-box>
 		</div>
 	</div>
 </template>

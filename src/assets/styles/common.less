@@ -108,15 +108,27 @@
   //   背景透明度
   .bg-opacity1-fff {
     background: @@color-opacity1-fff;
+    &:hover {
+      background: @@color-opacity2-fff;
+    }
   }
   .bg-opacity2-fff {
     background: @@color-opacity2-fff;
+    &:hover {
+      background: @@color-opacity1-fff;
+    }
   }
   .bg-opacity3-fff {
     background: @@color-opacity3-fff;
+    &:hover {
+      background: @@color-opacity2-fff;
+    }
   }
   .bg-opacity4-fff {
     background: @@color-opacity4-fff;
+    &:hover {
+      background: @@color-opacity3-fff;
+    }
   }
 
   // border 颜色
@@ -147,4 +159,11 @@
 
 .body-light {
   .styleChangePop(light);
+}
+
+// 通用样式
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

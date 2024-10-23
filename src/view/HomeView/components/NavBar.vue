@@ -27,7 +27,7 @@ const onChange = () => {
 		<n-popover class="pop-bg" trigger="click" :show-arrow="false">
 			<template #trigger>
 				<div class="w-8 h-8 flex justify-center items-center cursor-pointer">
-					<n-icon class="color3 transition-colors" size="24">
+					<n-icon class="color3 transition-all hover:transform-rotate-180" size="24">
 						<Settings24Filled />
 					</n-icon>
 				</div>
@@ -50,7 +50,7 @@ const onChange = () => {
 					<span class="color3 pl-2">切换主题</span>
 				</div>
 				<div class="menu-hover flex items-center p-1 rounded-md transition-colors cursor-pointer">
-					<div class=" w-8 h-8 flex items-center justify-center">
+					<div class="w-8 h-8 flex items-center justify-center">
 						<n-icon size="24" class="color3">
 							<QuestionCircle24Filled />
 						</n-icon>
