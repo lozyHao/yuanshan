@@ -95,14 +95,30 @@
   }
 
   //  背景颜色
+  .bg-color1 {
+    background: @@color-111;
+  }
+  .bg-color3 {
+    background: @@color-333;
+  }
   .bg-color9 {
     background: @@color-999;
+  }
+  .bg-color12 {
+    background: @@color-aaa;
+  }
+  .bg-color13 {
+    background: @@color-ddd;
   }
   .bg-color15 {
     background: @@color-eee;
   }
   .bg-color16 {
     background: @@color-fff;
+  }
+
+  .bg-color-info {
+    background: @@color-info;
   }
 
   //   背景透明度
@@ -131,24 +147,115 @@
     }
   }
 
+  .bg-opacity3-000 {
+    background: @@color-opacity3-000;
+  }
+
   // border 颜色
   .border-color15 {
     border-color: @@color-eee;
+  }
+  .border-color14 {
+    border-color: @@color-ddd;
+  }
+  .border-color9 {
+    border-color: @@color-999;
   }
   .border-color3 {
     border-color: @@color-333;
   }
 
   // 弹出层
-  .pop-bg {
+  .n-popover {
+    background: @@color-eee;
+    border-radius: 12px;
+  }
+  // 模态框
+  .n-card.n-modal {
+    background: @@color-eee;
+    border-radius: 16px;
+    .n-card-header {
+      padding: 20px;
+    }
+    .n-card__content {
+      padding: 0 20px 20px;
+    }
+  }
+
+  // 抽屉
+  .n-drawer.n-drawer--bottom-placement {
     background: @@color-eee !important;
-    border-radius: 12px !important;
-    padding: 12px !important;
+    overflow: hidden;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+  }
+
+  //   tabs
+  .n-tabs {
+    height: 100%;
+    .n-tab-pane {
+      width: 100%;
+      height: 100%;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 12px 12px 0 0;
+      -webkit-overflow-scrolling: touch;
+
+      // 自定义滚动条样式
+      &::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        border-radius: 10px;
+        -webkit-box-shadow: inset 0 0 5px @@color-999;
+        background: @@color-999;
+      }
+
+      &::-webkit-scrollbar-track {
+        -webkit-box-shadow: inset 0 0 5px @@color-ddd;
+        border-radius: 0;
+        background: @@color-ddd;
+      }
+    }
+  }
+
+  //   弹出选择
+  .n-base-select-menu {
+    width: 200px;
+    background: @@color-eee;
+    border-radius: 12px;
   }
 
   // 自定义菜单按钮悬浮效果
   .menu-hover {
     &:hover {
+      background: @@color-ddd;
+    }
+  }
+
+  #default-layout,
+  .default-layout {
+    overflow-x: auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+
+    // 自定义滚动条样式
+    &::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-radius: 10px;
+      -webkit-box-shadow: inset 0 0 5px @@color-aaa;
+      background: @@color-aaa;
+    }
+
+    &::-webkit-scrollbar-track {
+      -webkit-box-shadow: inset 0 0 5px @@color-ddd;
+      border-radius: 0;
       background: @@color-ddd;
     }
   }
@@ -162,8 +269,24 @@
 }
 
 // 通用样式
+.flex-start {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+}
 .flex-center {
   display: flex;
   justify-content: center;
+  align-items: center;
+}
+
+.flex-end {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+.flex-between {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
 }

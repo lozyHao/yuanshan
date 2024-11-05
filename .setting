@@ -1,0 +1,45 @@
+{
+	"workbench.colorTheme": "Visual Studio Dark",
+	"editor.accessibilitySupport": "off",
+	"git.autofetch": true,
+	"editor.tabSize": 2,
+	"security.workspace.trust.untrustedFiles": "open",
+	"gitlens.views.branches.branches.layout": "list",
+	"editor.fontSize": 15,
+	"GitCommitPlugin.ShowEmoji": false,
+	"workbench.editorAssociations": {
+		"git-rebase-todo": "gitlens.rebase"
+	},
+	"[javascript]": {
+		"editor.defaultFormatter": "vscode.typescript-language-features"
+	},
+	"liveServer.settings.donotShowInfoMsg": true,
+	"explorer.confirmDelete": false,
+	"window.zoomLevel": 1,
+	"breadcrumbs.enabled": false,
+	"editor.stickyScroll.enabled": false,
+	"cSpell.userWords": [
+		"consola",
+		"iconify",
+		"persistedstate",
+		"pinia",
+		"popconfirm",
+		"unplugin",
+		"vite"
+	],
+	"[vue]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"eslint.enable": true,
+	"eslint.run": "onType",
+	"eslint.options": {
+		"extensions": [
+			".js",
+			".ts",
+			".vue",
+			".jsx",
+			".tsx"
+		]
+	},
+	"eslint.codeActionsOnSave.rules": null
+}

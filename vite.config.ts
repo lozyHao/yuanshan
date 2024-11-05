@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import electron from 'vite-plugin-electron'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
@@ -11,6 +12,9 @@ import path from 'path';
 export default defineConfig({
 	plugins: [
 		vue(),
+		electron({
+			entry: './electron/main/index.js',
+		}),
 		UnoCSS(),
 		AutoImport({
 			imports: [

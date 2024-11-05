@@ -3,7 +3,6 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { darkTheme } from 'naive-ui'
 
-import { Theme } from '@/interfaces/theme.ts'
 import { ThemeEnum } from '@/interfaces/theme.ts'
 
 /**
