@@ -1,14 +1,7 @@
 <script setup lang="ts">
 import { CloudUpload } from '@vicons/ionicons5'
-
+import { IconSize } from '@/interfaces/options.ts'
 import { PropType } from 'vue'
-
-enum IconSize {
-	Mini = 'tiny',
-	Small = 'small',
-	Medium = 'medium',
-	Large = 'large'
-}
 
 const props = defineProps({
 	iconSize: {

@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import { Delete24Regular } from "@vicons/fluent";
-import { CloudUpload } from "@vicons/ionicons5";
 
 import { defaultOptions } from '@/default/default-options.ts'
-import { getImgSrc } from '@/utils/tool.ts'
-import { OptionLensValues } from "@/interfaces/options.ts";
+import { OptionLensValues, IconSize } from "@/interfaces/options.ts";
 
 import { computed, ref, watch } from "vue";
 import { useMessage } from "naive-ui";
@@ -145,7 +143,7 @@ watch(() => props.show, (newVal) => {
 				<n-gi class="flex-start" :span="3">
 					<n-input v-if="formValue.contentType == 0" v-model:value="formValue.contentText"></n-input>
 					<div class="flex-start" v-if="formValue.contentType == 1">
-						<upload-file :iconSize="'small'"
+						<upload-file :iconSize="IconSize.Mini"
 							@on-change="($event) => formValue.contentImage = $event"></upload-file>
 						<n-image class="h-10 flex-1 ml-2" object-fit="contain" v-if="formValue.contentImage"
 							:src="formValue.contentImage">
@@ -182,7 +180,7 @@ watch(() => props.show, (newVal) => {
 				<n-gi class="flex-end" :span="1">字体</n-gi>
 				<n-gi class="flex-start" :span="4">
 					<font-select v-model:font="formValue.font" />
-					<n-switch size="small" class="mx-2" v-model:value="formValue.forceReplace"></n-switch>
+					<n-switch size="small" class="mx-2" v-model:value="formValue.used"></n-switch>
 					<div>强制替换</div>
 				</n-gi>
 

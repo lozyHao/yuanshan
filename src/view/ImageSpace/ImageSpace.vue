@@ -29,6 +29,7 @@ const loading = computed(() => {
 const handleFileChange = (e: Event) => {
 	const t = e.target as HTMLInputElement
 	const isRepetition = store.addFiles(Array.from(t.files as FileList))
+
 	if (isRepetition) {
 		message.warning(isRepetition)
 	}

@@ -1,0 +1,235 @@
+{
+	"Thumbnail": {
+		"type": "image/jpeg"
+	},
+	"ImageWidth": {
+		"id": 256,
+		"value": 3936,
+		"description": 3936
+	},
+	"ImageLength": {
+		"id": 257,
+		"value": 2624,
+		"description": 2624
+	},
+	"Make": {
+		"id": 271,
+		"value": [
+			"NIKON"
+		],
+		"description": "NIKON"
+	},
+	"Model": {
+		"id": 272,
+		"value": [
+			"NIKON Z 6_2"
+		],
+		"description": "NIKON Z 6_2"
+	},
+	"ExposureTime": {
+		"id": 33434,
+		"value": [
+			1,
+			25
+		],
+		"description": "1/25"
+	},
+	"FNumber": {
+		"id": 33437,
+		"value": [
+			22,
+			1
+		],
+		"description": "f/22"
+	},
+	"ExposureProgram": {
+		"id": 34850,
+		"value": 0,
+		"description": "Undefined"
+	},
+	"ISOSpeedRatings": {
+		"id": 34855,
+		"value": 125,
+		"description": 125
+	},
+	"SensitivityType": {
+		"id": 34864,
+		"value": 2,
+		"description": "Recommended Exposure Index"
+	},
+	"RecommendedExposureIndex": {
+		"id": 34866,
+		"value": 125,
+		"description": 125
+	},
+	"ExifVersion": {
+		"id": 36864,
+		"value": [
+			"0231"
+		],
+		"description": "ç"
+	},
+	"DateTimeOriginal": {
+		"id": 36867,
+		"value": [
+			"2024:06:08 17:32:04"
+		],
+		"description": "2024:06:08 17:32:04"
+	},
+	"DateTimeDigitized": {
+		"id": 36868,
+		"value": [
+			"2024:06:08 17:32:04"
+		],
+		"description": "2024:06:08 17:32:04"
+	},
+	"ExposureBiasValue": {
+		"id": 37380,
+		"value": [
+			0,
+			6
+		],
+		"description": "0"
+	},
+	"MeteringMode": {
+		"id": 37383,
+		"value": 5,
+		"description": "Pattern"
+	},
+	"LightSource": {
+		"id": 37384,
+		"value": 0,
+		"description": "Unknown"
+	},
+	"FocalLength": {
+		"id": 37386,
+		"value": [
+			240,
+			10
+		],
+		"description": "24 mm"
+	},
+	"SubSecTimeOriginal": {
+		"id": 37521,
+		"value": [
+			"30"
+		],
+		"description": "30"
+	},
+	"SubSecTimeDigitized": {
+		"id": 37522,
+		"value": [
+			"30"
+		],
+		"description": "30"
+	},
+	"ColorSpace": {
+		"id": 40961,
+		"value": 1,
+		"description": "sRGB"
+	},
+	"FocalPlaneXResolution": {
+		"id": 41486,
+		"value": [
+			55150724,
+			32768
+		],
+		"description": "1683.0665283203125"
+	},
+	"FocalPlaneYResolution": {
+		"id": 41487,
+		"value": [
+			55150724,
+			32768
+		],
+		"description": "1683.0665283203125"
+	},
+	"FocalPlaneResolutionUnit": {
+		"id": 41488,
+		"value": 3,
+		"description": "centimeters"
+	},
+	"SensingMethod": {
+		"id": 41495,
+		"value": 2,
+		"description": "One-chip color area sensor"
+	},
+	"FileSource": {
+		"id": 41728,
+		"value": 3,
+		"description": "DSC"
+	},
+	"SceneType": {
+		"id": 41729,
+		"value": 1,
+		"description": "A directly photographed image"
+	},
+	"CustomRendered": {
+		"id": 41985,
+		"value": 1,
+		"description": "Custom process"
+	},
+	"ExposureMode": {
+		"id": 41986,
+		"value": 1,
+		"description": "Manual exposure"
+	},
+	"WhiteBalance": {
+		"value": "Custom",
+		"attributes": {},
+		"description": "Custom"
+	},
+	"FocalLengthIn35mmFilm": {
+		"id": 41989,
+		"value": 36,
+		"description": 36
+	},
+	"BodySerialNumber": {
+		"id": 42033,
+		"value": [
+			"8072725"
+		],
+		"description": "8072725"
+	},
+	"LensMake": {
+		"id": 42035,
+		"value": [
+			"NIKON"
+		],
+		"description": "NIKON"
+	},
+	"LensModel": {
+		"value": "24-200mm f2.8-6.2",
+		"attributes": {},
+		"description": "24-200mm f2.8-6.2"
+	},
+	"SerialNumber": {
+		"value": "8072725",
+		"attributes": {},
+		"description": "8072725"
+	},
+	"Lens": {
+		"value": "NIKKOR Z 24-200mm f/4-6.3 VR",
+		"attributes": {},
+		"description": "NIKKOR Z 24-200mm f/4-6.3 VR"
+	},
+	"LensSerialNumber": {
+		"value": "20088772",
+		"attributes": {},
+		"description": "20088772"
+	},
+	"ImageNumber": {
+		"value": "856",
+		"attributes": {},
+		"description": "856"
+	},
+	"format": {
+		"value": "image/jpeg",
+		"attributes": {},
+		"description": "image/jpeg"
+	},
+	"FileType": {
+		"value": "jpeg",
+		"description": "JPEG"
+	}
+}

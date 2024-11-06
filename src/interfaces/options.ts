@@ -97,11 +97,11 @@ export enum OptionLensEnum {
 export interface OptionLensValues {
 	[OptionLensEnum.KEY]: string;
 	[OptionLensEnum.TYPE]: number;
-	[OptionLensEnum.NAME]: string;
+	[OptionLensEnum.NAME]: string | null;
 	[OptionLensEnum.CONTENT_TYPE]?: number;
-	[OptionLensEnum.CONTENT_TEXT]?: string;
-	[OptionLensEnum.CONTENT_IMAGE]?: File;
-	[OptionLensEnum.FORCED_USED]?: boolean;
+	[OptionLensEnum.CONTENT_TEXT]?: string | null;
+	[OptionLensEnum.CONTENT_IMAGE]?: File | null;
+	[OptionLensEnum.FORCED_USED]: boolean;
 	[OptionLensEnum.FONT]?: string | null;
 	[OptionLensEnum.FONT_USED]?: boolean;
 	[OptionLensEnum.SIZE]?: number;
@@ -153,4 +153,12 @@ export enum AspectRatioEnum {
 export interface ResultMessage {
 	status: number;
 	msg: string;
+}
+
+// iconSize
+export enum IconSize {
+	Mini = 'tiny',
+	Small = 'small',
+	Medium = 'medium',
+	Large = 'large'
 }

@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { ref, watch } from "vue"
+import { ref, watch, PropType } from "vue"
 
 import { fontOptions } from '@/default/default-options.ts'
 
 const props = defineProps({
 	font: {
-		type: String,
+		type: String as PropType<string | null>,
 		default: null,
 	}
 })
