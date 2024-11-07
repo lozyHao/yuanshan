@@ -5,6 +5,10 @@ import { computed } from "vue";
 
 import { useThemeStore } from "./store/theme";
 
+import ImageSpace from "@/view/ImageSpace.vue";
+import TitleBar from "@/components/TitleBar.vue";
+
+
 const store = useThemeStore();
 
 const theme = computed(() => {
@@ -34,10 +38,23 @@ const darkThemeOverrides = {
 			<n-dialog-provider>
 				<n-message-provider>
 					<div id="app-content" class="bg-color15">
-						<router-view></router-view>
+						<div
+							class="drag-box border-color16 border-b-1 border-b-solid w-full h-10 bg-color14 pl-4 pr-36">
+							<title-bar></title-bar>
+						</div>
+						<div class="content-box">
+							<image-space></image-space>
+						</div>
 					</div>
 				</n-message-provider>
 			</n-dialog-provider>
 		</n-modal-provider>
 	</n-config-provider>
 </template>
+
+<style lang="less" scoped>
+.content-box {
+	width: 100%;
+	height: calc(100% - 40px);
+}
+</style>

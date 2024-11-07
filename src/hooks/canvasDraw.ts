@@ -164,28 +164,24 @@ class CanvasDraw {
 	 * @param blur 模糊度
 	 */
 	async drawBlurImage(
-		image: File,
+		image: string,
 		width: number = 400,
 		height: number = 600,
 		blur: number = 20
 	) {
 		const img = new Image();
-		img.src = URL.createObjectURL(image);
-		return await new Promise((resolve) => {
-			img.onload = () => {
-				this.ctx.filter = `blur(${blur}px)`;
-				this.ctx.drawImage(
-					img,
-					width * -0.3,
-					height * -0.3,
-					width * 1.6,
-					height * 1.6
-				);
-				this.ctx.filter = "none";
-
-				resolve(this.canvas.toDataURL());
-			};
-		});
+		img.src = image;
+		img.onload = () => {
+			this.ctx.filter = `blur(${blur}px)`;
+			this.ctx.drawImage(
+				img,
+				width * -0.3,
+				height * -0.3,
+				width * 1.6,
+				height * 1.6
+			);
+			this.ctx.filter = "none";
+		};
 	}
 
 	/**
@@ -198,7 +194,7 @@ class CanvasDraw {
 	 * @param shadow 阴影大小
 	 */
 	async drawMainImage(
-		image: File,
+		image: string,
 		width: number,
 		height: number,
 		rotate: number = 0.9,
@@ -206,7 +202,7 @@ class CanvasDraw {
 		rounded: number = Math.min(width * rotate, height * rotate) * 0.1
 	) {
 		const img = new Image();
-		img.src = URL.createObjectURL(image);
+		img.src = image;
 		return await new Promise((resolve) => {
 			img.onload = () => {
 				const bx = (width * (1 - rotate)) / 2;

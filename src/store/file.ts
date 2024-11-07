@@ -2,6 +2,7 @@ import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 
 import ImageData from '@/hooks/imageData'
+import WorkerManager from "@/hooks/WorkerManager";
 
 /**
  * 处理的文件列表
@@ -10,42 +11,27 @@ export const useFileStore = defineStore('file', () => {
 	const _imageData = ref<ImageData[]>([]) // 文件列表
 	const _currentPreIndex = ref<number>(0) // 当前预览图索引
 
+	const _loading = ref<boolean>(false)
+
 	const fileLength = computed<number>(() => _imageData.value.length)
 
-	const addFiles = (files: File[]): string | null => {
-		let isRepetition: string | null = null
-
-		if (fileLength.value >= 20) {
-			isRepetition = "文件数量超出限制[最大20张]，请删除后重新上传"
-			return isRepetition
-		}
-
-		for (const file of files) {
-			// 校验文件是否重复
-			const index = _imageData.value.findIndex(item => item.filename === file.name && item.file?.size === file.size)
-			if (fileLength.value >= 20) {
-				isRepetition = "文件数量超出限制[最大20张]，请删除后重新上传"
-				break;
-			}
-
-			if (index > -1) {
-				isRepetition = "文件重复，请修改后重新上传"
-				continue
-			}
-
-			// 正则校验文件是否是 "image/jpeg,image/png,image/jpg"
-			const reg = new RegExp(`image\/(jpeg|png|jpg)`);
-			if (!reg.test(file.type)) {
-				isRepetition = "文件格式不正确，请上传jpeg/png/jpg图片文件"
-				continue
-			}
-
-			// 异步处理文件读取和添加操作
-			const imageData = new ImageData(file);
-			_imageData.value.push(imageData);
-		}
-
-		return isRepetition
+	const addFiles = async (files: File[]): Promise<string> => {
+		_loading.value = true
+		return await new Promise((resolve) => {
+			const worker = new WorkerManager();
+			worker.createWorker("addFiles", new URL("../hooks/worker.ts", import.meta.url).href);
+			worker.postMessage("addFiles", { data: files, currentFiles: [..._imageData.value.map(item => item.file)] }, (message: { str: string, files: File[] }) => {
+				console.log("接收到的数据", message);
+				const { files, str } = message
+				if (files && files.length > 0) {
+					message.files.forEach((file: File) => {
+						_imageData.value.push(new ImageData(file))
+					})
+				}
+				_loading.value = false
+				resolve(str);
+			});
+		})
 	}
 
 	const removeFile = (key: string) => {
@@ -86,5 +72,5 @@ export const useFileStore = defineStore('file', () => {
 		}
 	}
 
-	return { _imageData, _currentPreIndex, fileLength, addFiles, removeFile, getFile, startPreview, reset, setCurrentPreIndex, onNext }
+	return { _imageData, _currentPreIndex, _loading, fileLength, addFiles, removeFile, getFile, startPreview, reset, setCurrentPreIndex, onNext }
 })

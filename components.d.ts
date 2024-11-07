@@ -77,6 +77,7 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     TemplateChoose: typeof import('./src/components/templateChoose.vue')['default']
+    TitleBar: typeof import('./src/components/TitleBar.vue')['default']
     UploadFile: typeof import('./src/components/UploadFile.vue')['default']
     Waterfall: typeof import('./src/components/Waterfall.vue')['default']
   }

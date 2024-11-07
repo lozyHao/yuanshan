@@ -33,6 +33,7 @@
 		"src/**/*.tsx",
 		"src/**/*.vue",
 		"src/**/*.js",
-		"src/**/*.jsx"
+		"src/**/*.jsx",
+		"electron/hooks/semaphore.js"
 	]
 }

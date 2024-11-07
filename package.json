@@ -14,19 +14,20 @@
 	"dependencies": {
 		"@unocss/reset": "^0.63.4",
 		"@vueuse/core": "^11.1.0",
+		"events": "^3.3.0",
 		"exifreader": "^4.24.0",
 		"jimp": "^1.6.0",
 		"less": "^4.2.0",
 		"less-loader": "^12.2.0",
 		"pinia": "^2.2.4",
 		"pinia-plugin-persistedstate": "^4.1.1",
+		"semaphore-async-await": "^1.5.1",
 		"some-library": "^1.0.0",
 		"unplugin-auto-import": "^0.18.3",
 		"unplugin-vue-components": "^0.27.4",
 		"uuid": "^11.0.2",
 		"vue": "^3.5.10",
-		"vue-draggable-plus": "^0.5.4",
-		"vue-router": "^4.4.5"
+		"vue-draggable-plus": "^0.5.4"
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.13.0",

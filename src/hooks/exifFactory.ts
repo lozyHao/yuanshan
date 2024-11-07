@@ -31,7 +31,7 @@ class ExifFactory {
 	// 获取图片的exif信息
 	async load(file: File): Promise<ExifData> {
 		const exif: Exif = await Exifreader.load(file);
-		console.log(exif)
+
 		const result: ExifData = this.getExif(exif);
 		this.exif = result;
 		return result;

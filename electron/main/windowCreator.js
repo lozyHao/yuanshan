@@ -10,16 +10,21 @@ const createWindow = () => {
 		width: 1080,
 		height: 600,
 		minWidth: 1080,
-		minHeight: 600,
-		title: "远 山",
+		minHeight: 640,
 		show: false,
+		// frame: false,
+		titleBarStyle: 'hidden',
+		titleBarOverlay: {
+			color: '#ffffff00',
+			symbolColor: '#999',
+			height: 40
+
+		},
 		autoHideMenuBar: true,
 		webPreferences: {
 			preload: join(app.getAppPath(), '/electron/preload/index.js')
 		}
 	});
-
-	win.representedFilename = "../../public/favicon.ico";
 
 	win.once("ready-to-show", () => {
 		win.show();

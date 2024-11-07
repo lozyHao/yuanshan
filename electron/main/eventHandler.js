@@ -1,12 +1,17 @@
 import { ipcMain, dialog, shell } from 'electron';
 import path from 'path';
 import fs from 'fs';
+import { Buffer } from 'buffer';
+
+import taskQueueManager from './taskQueueManager.js';
 
 const start = () => {
 	ipcMain.handle('dialog:openFile', handleFileOpen);
 	ipcMain.handle('dialog:openFileMulti', handleFileOpenMulti);
 	ipcMain.handle('dialog:openFileDirectory', handleFileOpenDirectory);
+
 	ipcMain.on('dialog:openFileDirectoryByPath', handleFileOpenDirectoryByPath);
+	ipcMain.on('files-to-save', handleSaveFiles);
 }
 
 
@@ -65,4 +70,46 @@ async function saveFilesToDirectory(filePaths, directory) {
 	return savedPaths;
 }
 
-export default start 
+
+// 保存文件
+const handleSaveFiles = async (event, base64DataList) => {
+	base64DataList.forEach((data, index) => {
+		const task = saveFile(data, index, event);
+		taskQueueManager.addTask(task);
+	});
+}
+
+// 保存文件的函数
+const saveFile = (data, index, event) => {
+	return new Promise((resolve, reject) => {
+		const filePath = path.join('path/', `${index}.png`);
+		const buffer = Buffer.from(data.split(',')[1], 'base64');
+		fs.writeFile(filePath, buffer, (err) => {
+			if (err) {
+				event.reply('file-save-result', {
+					message: `文件${index}保存失败: ${err.message}`,
+					type: 'error'
+				});
+				reject(err);
+			} else {
+				event.reply('file-save-result', {
+					message: `文件${index}保存成功`,
+					type: 'success'
+				});
+				resolve();
+			}
+		});
+	});
+};
+
+// 监听所有任务完成事件
+taskQueueManager.on('allTasksCompleted', () => {
+	console.log('所有任务完成');
+
+	ipcMain.send('file-save-result', {
+		message: `文件保存结束`,
+		type: 'end'
+	});
+});
+
+export default start;
