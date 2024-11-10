@@ -3,6 +3,9 @@ import { defineStore } from 'pinia'
 
 import ImageData from '@/hooks/imageData'
 import WorkerManager from "@/hooks/WorkerManager";
+import { getParams } from "@/hooks/paramsUtils"
+
+import { OptionBasicValues, OptionTextTemplateValues, OptionLensValues } from '@/interfaces/options'
 
 /**
  * 处理的文件列表
@@ -21,8 +24,8 @@ export const useFileStore = defineStore('file', () => {
 			const worker = new WorkerManager();
 			worker.createWorker("addFiles", new URL("../hooks/worker.ts", import.meta.url).href);
 			worker.postMessage("addFiles", { data: files, currentFiles: [..._imageData.value.map(item => item.file)] }, (message: { str: string, files: File[] }) => {
-				console.log("接收到的数据", message);
 				const { files, str } = message
+				console.log("上传的文件", message)
 				if (files && files.length > 0) {
 					message.files.forEach((file: File) => {
 						_imageData.value.push(new ImageData(file))
@@ -46,9 +49,16 @@ export const useFileStore = defineStore('file', () => {
 	}
 
 	// 开启预览
-	const startPreview = () => {
+	const startPreview = async (options: { basic: OptionBasicValues, text: OptionTextTemplateValues[], lens: OptionLensValues[] }) => {
+		const { basic, text, lens } = options
+		const data = await getParams({
+			exif: _imageData.value[_currentPreIndex.value].exif,
+			basic,
+			text,
+			lens
+		})
 		// 开启预览
-		_imageData.value[_currentPreIndex.value].startPreview()
+		_imageData.value[_currentPreIndex.value].startPreview(data)
 	}
 
 	// 重置清空
@@ -62,15 +72,5 @@ export const useFileStore = defineStore('file', () => {
 		_currentPreIndex.value = index
 	}
 
-	// 顺序切图
-	const onNext = (type: number) => {
-		if (type === 0) {
-			_currentPreIndex.value = _currentPreIndex.value === 0 ? 0 : _currentPreIndex.value - 1
-		}
-		if (type === 1) {
-			_currentPreIndex.value = _currentPreIndex.value === _imageData.value.length - 1 ? _imageData.value.length - 1 : _currentPreIndex.value + 1
-		}
-	}
-
-	return { _imageData, _currentPreIndex, _loading, fileLength, addFiles, removeFile, getFile, startPreview, reset, setCurrentPreIndex, onNext }
+	return { _imageData, _currentPreIndex, _loading, fileLength, addFiles, removeFile, getFile, startPreview, reset, setCurrentPreIndex }
 })

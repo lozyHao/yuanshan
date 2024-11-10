@@ -13,10 +13,14 @@ export const useOptionLensStore = defineStore(
 		const _data = ref<OptionLensValues[]>([...exifFields]);
 
 		// 添加
-		const add = (option: OptionLensValues) => {
+		const add = (option: OptionLensValues): { status: boolean, msg: string } => {
+			if (_data.value.length >= 26) {
+				return { status: false, msg: "最多添加 10 项" };
+			}
 			option.key = getUUID();
-			option.description = `{${option.key}}`;
+			option.description = `{${option.name}}`;
 			_data.value.push(option);
+			return { status: true, msg: "添加成功" }
 		};
 
 		// 获取
@@ -37,6 +41,17 @@ export const useOptionLensStore = defineStore(
 			}
 		};
 
+
+		// 开启/关闭
+		const handleChange = (key: string, value: boolean) => {
+			const item = _data.value.find(
+				(item: OptionLensValues) =>
+					item.key === key
+			);
+			if (!item) return
+			item.used = value
+		};
+
 		// 删除
 		const del = (key: string) => {
 			_data.value = _data.value.filter(
@@ -49,13 +64,20 @@ export const useOptionLensStore = defineStore(
 			return [..._data.value];
 		};
 
+		// 恢复默认
+		const reset = () => {
+			_data.value = [...exifFields];
+		};
+
 		return {
 			_data,
 			get,
 			add,
 			edit,
+			handleChange,
 			del,
 			getValue,
+			reset
 		};
 	},
 	{

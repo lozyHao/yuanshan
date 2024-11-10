@@ -45,7 +45,11 @@ const onSubmit = (template: OptionTextTemplateValues | null) => {
 		message.success("修改成功");
 	} else {
 		// 添加
-		store.add(template);
+		const { status, msg } = store.add(template);
+		if (!status) {
+			message.error(msg);
+			return
+		}
 		message.success("添加成功");
 	}
 
@@ -64,7 +68,7 @@ const onMove = async (
 ) => {
 	const result = await store.changePosition({
 		position,
-		key: item.key,
+		key: item.key as string,
 	});
 	if (result.status === 1) {
 		message.success(result.msg);
@@ -76,7 +80,7 @@ const onMove = async (
 const onRemove = async (
 	item: OptionTextTemplateValues
 ) => {
-	store.remove(item.key);
+	store.remove(item.key as string);
 
 };
 // 交换位置顺序，修改order
@@ -100,7 +104,7 @@ const onChangeOrder = async (
 				<div v-show="headerList.length === 0" class="flex-center color9">
 					无配置项
 				</div>
-				<div v-for="(item, index) in headerList" :key="item.key"
+				<div v-for="(item, index) in headerList" :key="item.key as string"
 					class="flex-end bg-color15 rounded-lg p-1 my-2">
 
 					<div class="px-2 flex-1">{{ item.name }}</div>
@@ -143,7 +147,7 @@ const onChangeOrder = async (
 				<div v-show="middleList.length === 0" class="flex-center color9">
 					无配置项
 				</div>
-				<div v-for="(item, index) in middleList" :key="item.key"
+				<div v-for="(item, index) in middleList" :key="item.key as string"
 					class="flex-end bg-color15 rounded-lg p-1 my-2">
 					<div class="px-2 flex-1">{{ item.name }}</div>
 					<n-space size="small">
@@ -184,7 +188,7 @@ const onChangeOrder = async (
 				<div v-show="footerList.length === 0" class="flex-center color9">
 					无配置项
 				</div>
-				<div v-for="(item, index) in footerList" :key="item.key"
+				<div v-for="(item, index) in footerList" :key="item.key as string"
 					class="flex-end bg-color15 rounded-lg p-1 my-2">
 					<div class="px-2 flex-1">{{ item.name }}</div>
 					<n-space size="small">

@@ -1,18 +1,34 @@
 <script setup lang="ts">
-import { Play24Filled, Delete24Filled, ChevronLeft24Filled, ChevronRight24Filled } from "@vicons/fluent";
+import { Play24Filled, Delete24Filled, Copy24Regular, Clipboard24Regular } from "@vicons/fluent";
 import { CloudUpload } from '@vicons/tabler'
 
-import { computed } from "vue";
-import ImageData from "@/hooks/imageData";
-import { useFileStore } from '@/store/file.ts'
+import { computed, ref } from "vue";
 import { useMessage, useDialog } from 'naive-ui'
 
+import ImageData from "@/hooks/imageData";
+import { useFileStore } from '@/store/file.ts'
+import { useOptionBasicStore } from '@/store/optionBasic.ts'
+import { useOptionTextStore } from '@/store/optionText.ts'
+import { useOptionLensStore } from '@/store/optionLens.ts'
+
+import { fontOptions } from '@/default/default-options'
+import { loadFont } from '@/utils/tool'
+
 import Options from "./components/Options.vue";
-// import PreChoose from "./components/PreChoose.vue"; // TODO：预览保存，暂时不用
 import PreImage from "./components/PreImage.vue";
 import PreList from "./components/PreList.vue";
+import ImageDetail from "@/components/ImageDetail.vue";
+
+import { onMounted } from "vue";
+import { ExifData } from "@/hooks/exifFactory";
 
 const store = useFileStore();
+
+// 获取参数 stroe
+const basicStore = useOptionBasicStore()
+const textStore = useOptionTextStore()
+const lensStore = useOptionLensStore()
+
 const message = useMessage()
 const dialog = useDialog()
 
@@ -24,12 +40,14 @@ const preLoading = computed(() => store._loading)
 const loading = computed(() => {
 	return fileList.value[index.value]?.preLoading
 })
+const progress = computed(() => {
+	return fileList.value[index.value]?.progress || 0
+})
 
 // 选择文件
 const handleFileChange = async (e: Event) => {
 	const t = e.target as HTMLInputElement
 	const isRepetition = await store.addFiles(Array.from(t.files as FileList))
-	console.log(isRepetition)
 	if (isRepetition) {
 		message.warning(isRepetition)
 	}
@@ -51,15 +69,51 @@ const onClearAll = () => {
 	})
 }
 
-const onNext = (type: number = 1) => {
-	store.onNext(type)
-}
-
 
 // 开起/刷新预览
 const onStart = () => {
-	store.startPreview()
+	store.startPreview({
+		basic: basicStore._data,
+		text: textStore._data,
+		lens: lensStore._data
+	})
 }
+
+// 复制exif报告数据
+const onCopy = () => {
+	const jsonData = JSON.stringify(store._imageData[index.value]?.exif.exif);
+	const formattedData = JSON.stringify(JSON.parse(jsonData), null, 2); // 使用 2 个空格缩进进行格式化
+	navigator.clipboard.writeText(formattedData).then(() => {
+		message.success('复制成功')
+	}).catch(() => {
+		message.error('复制失败')
+	})
+}
+
+// 弹窗展示详细图片和exif信息列表，并可canvas截图导出
+const currentImageExif = ref<ExifData>({})
+const currentImage = ref<string>('')
+const showImageInfo = ref(false)
+const onShowImageInfo = () => {
+	currentImageExif.value = store._imageData[index.value]?.exif.exif
+	currentImage.value = store._imageData[index.value]?.perUrl
+
+	if (currentImageExif.value) {
+		showImageInfo.value = true
+		return
+	}
+	message.error('照片exif信息未加载完成')
+}
+
+// 初始化加载字体
+onMounted(async () => {
+	const res = await loadFont(fontOptions)
+	if (res) {
+		message.success('字体初始化完成')
+	} else {
+		message.error('字体加载失败，部分字体可能无法显示')
+	}
+})
 </script>
 
 <template>
@@ -107,7 +161,6 @@ const onStart = () => {
 					</n-text>
 					<input class="absolute top-0 left-0 w-full h-full cursor-pointer opacity-0" type="file" multiple
 						accept="image/jpg,image/jpeg,image/png" @change="handleFileChange">
-
 					<n-spin class="bg-opacity3-000 rounded-xl absolute top-0 left-0 z-10 w-full h-full" type="spinner"
 						size="large" v-show="preLoading"></n-spin>
 				</div>
@@ -118,11 +171,26 @@ const onStart = () => {
 				<div class="flex-center w-full h-10 mt-2" v-if="fileList.length > 0">
 					<!-- 控件 -->
 					<n-space size="small" align="center">
-						<n-button strong secondary circle type="info" size='small' @click="onNext(0)">
-							<template #icon>
-								<n-icon :component="ChevronLeft24Filled" />
+						<n-popover trigger="hover" :show-arrow="false">
+							<template #trigger>
+								<n-button strong secondary circle type="info" size="small" @click="onShowImageInfo">
+									<template #icon>
+										<n-icon :component="Copy24Regular" />
+									</template>
+								</n-button>
 							</template>
-						</n-button>
+							<span>报告预览</span>
+						</n-popover>
+						<n-popover trigger="hover" :show-arrow="false">
+							<template #trigger>
+								<n-button strong secondary circle type="info" size="small" @click="onCopy">
+									<template #icon>
+										<n-icon :component="Clipboard24Regular" />
+									</template>
+								</n-button>
+							</template>
+							<span>复制参数</span>
+						</n-popover>
 						<n-popover trigger="hover" :show-arrow="false">
 							<template #trigger>
 								<n-button strong secondary circle type="info" size="large" :loading="loading"
@@ -134,14 +202,15 @@ const onStart = () => {
 							</template>
 							<span>[开始/刷新] 预览</span>
 						</n-popover>
-						<n-button strong secondary circle type="info" size='small' @click="onNext(1)">
-							<template #icon>
-								<n-icon :component="ChevronRight24Filled" />
-							</template>
-						</n-button>
+
 					</n-space>
 				</div>
-				<div class="color9 absolute bottom-2 right-2">文件数 {{ fileList.length }} / 当前 {{ index + 1 }}</div>
+				<div class="color9 absolute bottom-3 right-3">文件数 {{ fileList.length }} / 当前 {{ index + 1 }}</div>
+				<div v-if="loading"
+					class="progress bg-color-info flex-center h-3 absolute bottom-[1px] transition-all text-[8px] text-#fff"
+					:style="{ width: progress + '%' }">
+					{{ progress }}%
+				</div>
 			</div>
 			<!-- 底部图片目录 -->
 			<div class="bottom_bar flex-center flex-wrap w-full h-auto transition-all">
@@ -152,6 +221,7 @@ const onStart = () => {
 				</transition>
 			</div>
 		</div>
+		<image-detail :exif="currentImageExif" :image="currentImage" v-model:show="showImageInfo"></image-detail>
 	</div>
 </template>
 

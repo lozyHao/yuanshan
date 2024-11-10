@@ -20,9 +20,9 @@ const onPre = (index: number | null) => {
 };
 
 // 上传文件
-const handleFileChange = (e: Event) => {
+const handleFileChange = async (e: Event) => {
 	const t = e.target as HTMLInputElement
-	const isRepetition = store.addFiles(Array.from(t.files as FileList))
+	const isRepetition = await store.addFiles(Array.from(t.files as FileList))
 	if (isRepetition) {
 		message.warning(isRepetition)
 	}

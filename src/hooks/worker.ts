@@ -1,7 +1,7 @@
 // worker.ts
 self.onmessage = (event) => {
 	const { data, currentFiles, callbackId } = event.data;
-	console.log(data, currentFiles)
+
 	const result = processFiles(data, currentFiles);
 	postMessage({ result, callbackId });
 };

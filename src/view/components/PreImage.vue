@@ -18,7 +18,7 @@ const url = computed(() => {
 </script>
 
 <template>
-	<div class="pre-image w-full h-full max-w-200 max-h-200 flex-center rounded-lg overflow-hidden">
+	<div class="pre-image w-full h-full max-w-200 max-h-200 flex-center rounded-[4px] overflow-hidden">
 		<img class="w-full h-full object-contain" :src="url" />
 	</div>
 </template>

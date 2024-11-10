@@ -34,6 +34,7 @@
 		"src/**/*.vue",
 		"src/**/*.js",
 		"src/**/*.jsx",
-		"electron/hooks/semaphore.js"
+		"electron/hooks/semaphore.js",
+		"src/typings.d.ts"
 	]
 }

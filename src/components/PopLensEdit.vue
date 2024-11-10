@@ -4,11 +4,13 @@ import { Delete24Regular } from "@vicons/fluent";
 import { defaultOptions } from '@/default/default-options.ts'
 import { OptionLensValues, IconSize } from "@/interfaces/options.ts";
 
-import { computed, ref, watch } from "vue";
+import { computed, ref, watch, PropType } from "vue";
 import { useMessage } from "naive-ui";
 
 import UploadFile from "./UploadFile.vue";
 import FontSelect from "@/components/FontSelect.vue";
+import MustText from "./MustText.vue";
+import cameraSelect from "@/components/CameraSelect.vue";
 
 const message = useMessage()
 
@@ -18,7 +20,7 @@ const props = defineProps({
 		default: false,
 	},
 	pre: {
-		type: Object,
+		type: Object as PropType<OptionLensValues | null>,
 		default: null,
 	},
 });
@@ -34,14 +36,14 @@ const formValue = ref<OptionLensValues>({
 	contentType: 0,
 	contentText: null,
 	contentImage: null,
-	forcedUsed: false,
 	font: defaultOptions.fontFamily,
-	fontUsed: false,
 	size: defaultOptions.fontSize,
 	color: defaultOptions.fontColor,
 	italic: defaultOptions.fontItalic,
 	bold: defaultOptions.fontBold,
 	used: true,
+	forcedUsed: false,
+	description: null
 });
 
 const onClose = () => {
@@ -90,13 +92,14 @@ watch(() => props.show, (newVal) => {
 			contentType: 0,
 			contentText: null,
 			contentImage: null,
-			forcedUsed: false,
 			font: defaultOptions.fontFamily,
 			size: defaultOptions.fontSize,
 			color: defaultOptions.fontColor,
 			italic: defaultOptions.fontItalic,
 			bold: defaultOptions.fontBold,
 			used: true,
+			forcedUsed: false,
+			description: null
 		}
 	}
 	if (newVal) {
@@ -111,13 +114,14 @@ watch(() => props.show, (newVal) => {
 		formValue.value.contentType = props.pre.contentType || 0
 		formValue.value.contentText = props.pre.contentText || null
 		formValue.value.contentImage = props.pre.contentImage || null
-		formValue.value.forcedUsed = props.pre.forcedUsed || false
 		formValue.value.font = props.pre.font || defaultOptions.fontFamily
 		formValue.value.size = props.pre.size || defaultOptions.fontSize
 		formValue.value.color = props.pre.color || defaultOptions.fontColor
 		formValue.value.italic = props.pre.italic || defaultOptions.fontItalic
 		formValue.value.bold = props.pre.bold || defaultOptions.fontBold
-		formValue.value.used = props.pre.used || true
+		formValue.value.used = props.pre.used || false
+		formValue.value.forcedUsed = props.pre.forcedUsed || false
+		formValue.value.description = props.pre.description
 	}
 })
 </script>
@@ -127,63 +131,72 @@ watch(() => props.show, (newVal) => {
 		:style="{ width: '600px' }" @update:show="onClose">
 		<div class="pre-edit-pop">
 			<n-grid x-gap="12" y-gap="16" :cols="6">
-				<n-gi class="flex-end" :span="1" v-if="formValue.type === 1">模板名称</n-gi>
-				<n-gi :span="5" v-if="formValue.type === 1">
-					<n-input v-model:value="formValue.name"></n-input>
+				<n-gi class="flex-end" :span="1">
+					<must-text label="名称"></must-text>
 				</n-gi>
-				<n-gi class="flex-end" :span="1">内容</n-gi>
+				<n-gi :span="5">
+					<n-input v-model:value="formValue.name" :disabled="formValue.type === 0"></n-input>
+				</n-gi>
+				<n-gi class="flex-end" :span="1">
+					<must-text label="内容"></must-text>
+				</n-gi>
 				<n-gi class="flex-start" :span="2">
-					<n-radio-group name="radiogroup" v-model:value="formValue.contentType">
+					<n-radio-group name="radiogroup" v-model:value="formValue.contentType"
+						:disabled="formValue.type === 0">
 						<n-space>
 							<n-radio key="0" :value="0"> 文本 </n-radio>
 							<n-radio key="1" :value="1"> 图片 </n-radio>
 						</n-space>
 					</n-radio-group>
 				</n-gi>
-				<n-gi class="flex-start" :span="3">
-					<n-input v-if="formValue.contentType == 0" v-model:value="formValue.contentText"></n-input>
-					<div class="flex-start" v-if="formValue.contentType == 1">
+				<n-gi class="flex-start" :span="3" v-if="formValue.contentType == 0">
+					<n-input v-model:value="formValue.contentText" :disabled="formValue.type === 0"></n-input>
+				</n-gi>
+				<n-gi class="flex-start" :span="3" v-if="formValue.contentType == 1">
+					<img class="h-10 w-50 object-contain" v-if="formValue.contentImage" :src="formValue.contentImage" />
+					<n-space vertical align="end" class="w-full">
 						<upload-file :iconSize="IconSize.Mini"
 							@on-change="($event) => formValue.contentImage = $event"></upload-file>
-						<n-image class="h-10 flex-1 ml-2" object-fit="contain" v-if="formValue.contentImage"
-							:src="formValue.contentImage">
-						</n-image>
-					</div>
-				</n-gi>
-				<n-gi class="flex-end" :span="1">强制使用</n-gi>
-				<n-gi class="flex-start" :span="2">
-					<!-- 系统默认参数设置是否强制使用 -->
-					<n-switch size="small" v-model:value="formValue.forcedUsed"></n-switch>
+						<camera-select @on-choose="($event) => formValue.contentImage = $event"></camera-select>
+					</n-space>
 				</n-gi>
 				<!-- 文字样式在类型为文字时使用 -->
 				<n-gi class="flex-center color6 font-bold text-base" :span="6">
 					文字样式
 				</n-gi>
-				<n-gi class="flex-end" :span="1">字号</n-gi>
+				<n-gi class="flex-end" :span="1">图片/字号</n-gi>
 				<n-gi class="flex-start" :span="2">
-					<n-input-number v-model:value="formValue.size"></n-input-number>
+					<n-input-number :precision="2" :step="0.05" :min="0.2" :max="0.9" v-model:value="formValue.size"
+						:disabled="!formValue.forcedUsed"></n-input-number>
 				</n-gi>
 				<n-gi class="flex-end" :span="1">颜色</n-gi>
 				<n-gi class="flex-start" :span="2">
-					<n-color-picker :modes="['hex']" :show-alpha="false"
-						v-model:value="formValue.color"></n-color-picker>
+					<n-color-picker :modes="['hex']" :show-alpha="false" v-model:value="formValue.color"
+						:disabled="!formValue.forcedUsed"></n-color-picker>
 				</n-gi>
 
 				<n-gi class="flex-end" :span="1">粗体</n-gi>
 				<n-gi class="flex-start" :span="2">
-					<n-switch size="small" v-model:value="formValue.bold"></n-switch>
+					<n-switch size="small" v-model:value="formValue.bold" :disabled="!formValue.forcedUsed"></n-switch>
 				</n-gi>
 				<n-gi class="flex-end" :span="1">斜体</n-gi>
 				<n-gi class="flex-start" :span="2">
-					<n-switch size="small" v-model:value="formValue.italic"></n-switch>
+					<n-switch size="small" v-model:value="formValue.italic"
+						:disabled="!formValue.forcedUsed"></n-switch>
 				</n-gi>
 				<n-gi class="flex-end" :span="1">字体</n-gi>
-				<n-gi class="flex-start" :span="4">
-					<font-select v-model:font="formValue.font" />
-					<n-switch size="small" class="mx-2" v-model:value="formValue.used"></n-switch>
-					<div>强制替换</div>
+				<n-gi class="flex-start" :span="5">
+					<font-select v-model:font="formValue.font" :disabled="!formValue.forcedUsed" />
+					<span class="color3 ml-2 text-xl"
+						:style="{ fontFamily: formValue.font || '', fontWeight: formValue.bold ? 'bold' : '', fontStyle: formValue.italic ? 'italic' : '' }">
+						远山
+					</span>
 				</n-gi>
-
+				<n-gi class="flex-end" :span="1">强制替换</n-gi>
+				<n-gi class="flex-start" :span="5">
+					<n-switch size="small" class="mx-2" v-model:value="formValue.forcedUsed"></n-switch>
+					<span class="color9 text-xs">强制替换文字模板中的默认文字样式参数</span>
+				</n-gi>
 				<n-gi :span="3">
 					<n-popconfirm @positive-click="onRemove" :disabled="formValue.type === 0 || !formValue.key">
 						<template #trigger>
@@ -193,7 +206,10 @@ watch(() => props.show, (newVal) => {
 								</template>
 							</n-button>
 						</template>
-						确认删除该模板吗？
+						<div>
+							<div class="font-bold">确认删除该自定义参数吗？</div>
+							<div class="text-xs">删除后模板中有使用该参数的文字将不会绘制该内容...</div>
+						</div>
 					</n-popconfirm>
 				</n-gi>
 				<n-gi class="flex-end" :span="3">
