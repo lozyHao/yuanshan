@@ -1,15 +1,18 @@
 {
 	"name": "yuanshan",
 	"private": true,
-	"version": "0.0.0",
+	"version": "1.0.0",
 	"type": "module",
 	"main": "./electron/main/index.js",
+	"description": "照片水印边框工具，照片信息输出",
 	"scripts": {
-		"dev": "vite",
-		"build": "vue-tsc -b && vite build",
-		"preview": "vite preview",
-		"build:win": "pnpm run build && vite --win",
-		"build:mac": "pnpm run build && vite --mac"
+		"start": "vite",
+		"build": "vite build",
+		"tsc": "tsc --noEmit",
+		"electron:dev": "chcp 65001 && vite --config vite.config.electron.ts",
+		"build:win": "vite build && electron-builder --win --config",
+		"build:mac": "vite build && electron-builder --mac --config",
+		"electron:generate-icons": "electron-icon-builder --input=./resources/icon.png --output=build --flatten"
 	},
 	"dependencies": {
 		"@unocss/reset": "^0.63.4",
@@ -41,6 +44,7 @@
 		"@vitejs/plugin-vue": "^5.1.4",
 		"electron": "^33.0.2",
 		"electron-builder": "^25.1.8",
+		"electron-icon-builder": "^2.0.1",
 		"eslint": "^9.13.0",
 		"eslint-plugin-vue": "^9.29.0",
 		"globals": "^15.11.0",
@@ -50,6 +54,45 @@
 		"unocss": "^0.63.4",
 		"vite": "^5.4.8",
 		"vite-plugin-electron": "^0.28.8",
+		"vite-plugin-electron-renderer": "^0.14.6",
 		"vue-tsc": "^2.1.6"
 	}
+	// "build": {
+	// 	"productName": "远山",
+	// 	"appId": "app.LozyHao.yuanshan",
+	// 	"asar": true,
+	// 	"extraResources": [
+	// 		{
+	// 			"from": "dist",
+	// 			"to": "dist/"
+	// 		}
+	// 	],
+	// 	"directories": {
+	// 		"output": "${version}"
+	// 	},
+	// 	"files": [
+	// 		"electron"
+	// 	],
+	// 	"nsis": {
+	// 		"oneClick": false,
+	// 		"allowToChangeInstallationDirectory": true
+	// 	},
+	// 	"mac": {
+	// 		"icon": "/icons/icon.icns",
+	// 		"artifactName": "${productName}-v${version}-${platform}-setup.${ext}"
+	// 	},
+	// 	"win": {
+	// 		"icon": "/icons/icon.ico",
+	// 		"artifactName": "${productName}-v${version}-${platform}-setup.${ext}",
+	// 		"target": [
+	// 			{
+	// 				"target": "nsis"
+	// 			}
+	// 		]
+	// 	},
+	// 	"linux": {
+	// 		"icon": "/icons/icon.ico",
+	// 		"artifactName": "${productName}-v${version}-${platform}-setup.${ext}"
+	// 	}
+	// }
 }

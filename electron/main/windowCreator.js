@@ -1,4 +1,5 @@
 import { BrowserWindow, app } from "electron";
+import fs from 'fs';
 import { join, dirname } from 'path';
 
 // 获取当前文件的目录路径
@@ -30,16 +31,17 @@ const createWindow = () => {
 	win.once("ready-to-show", () => {
 		win.show();
 	});
-
+	console.log("项目地址：", app.getAppPath())
 	// win.loadURL('http://localhost:3000')
 	// development模式
-	console.log(process.env.VITE_DEV_SERVER_URL)
+	console.log("开发环境：", process.env.VITE_DEV_SERVER_URL)
+	console.log("生产环境：", join(app.getAppPath(), "resources/dist/index.html"))
 	if (process.env.VITE_DEV_SERVER_URL) {
 		win.loadURL(process.env.VITE_DEV_SERVER_URL);
 		// 开启调试台
 		win.webContents.openDevTools();
 	} else {
-		win.loadFile(join(currentFilePath, "../dist/index.html"));
+		win.loadFile(join(app.getAppPath(), "/dist/index.html"));
 	}
 	return win;
 };
