@@ -5,7 +5,7 @@ import { ref, computed } from "vue";
 import { useMessage } from "naive-ui";
 
 import { useOptionLensStore } from "@/store/optionLens.ts";
-import { OptionLensValues, OptionLensEnum } from "@/interfaces/options.ts";
+import { OptionLensValues } from "@/interfaces/options.ts";
 
 import PopLensEdit from "@/components/PopLensEdit.vue";
 
@@ -28,17 +28,21 @@ const onSubmit = (item: OptionLensValues) => {
 		store.edit(item);
 		message.success("修改成功");
 	} else {
-		store.add(item);
+		const { status, msg } = store.add(item);
+		if (!status) {
+			message.error(msg);
+			return
+		}
 		message.success("添加成功");
 	}
 }
 
 const onDelete = (item: OptionLensValues) => {
-	store.del(item.key);
+	store.del(item.key as string);
 }
 
-const handleChange = (key: OptionLensEnum, value: string) => {
-	store.edit(key, value);
+const handleChange = (key: string | null, value: boolean) => {
+	store.handleChange(key as string, value);
 };
 </script>
 <template>
@@ -53,7 +57,7 @@ const handleChange = (key: OptionLensEnum, value: string) => {
 				</n-button>
 			</n-gi>
 			<n-gi class="flex-between bg-color15 rounded-lg p-1" v-for="item in myData" :key="item.key">
-				<n-switch size="small" v-model:value="item.used" @update:value="handleChange(item, $event)" />
+				<n-switch size="small" v-model:value="item.used" @update:value="handleChange(item.key, $event)" />
 				<div class="px-2 flex-1">{{ item.name }}</div>
 				<n-button strong secondary circle type="info" size="tiny" @click="onClickEdit(item)">
 					<template #icon>
@@ -68,7 +72,7 @@ const handleChange = (key: OptionLensEnum, value: string) => {
 				相机参数
 			</n-gi>
 			<n-gi class="flex-between bg-color15 rounded-lg p-1" v-for="item in systemData" :key="item.key">
-				<n-switch size="small" v-model:value="item.used" @update:value="handleChange(item, $event)" />
+				<n-switch size="small" v-model:value="item.used" @update:value="handleChange(item.key, $event)" />
 				<div class="px-2 flex-1">{{ item.name }}</div>
 				<n-button strong secondary circle type="info" size="tiny" @click="onClickEdit(item)">
 					<template #icon>

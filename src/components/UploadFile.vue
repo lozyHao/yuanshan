@@ -3,6 +3,7 @@ import { CloudUpload } from '@vicons/ionicons5'
 import { IconSize } from '@/interfaces/options.ts'
 import { PropType } from 'vue'
 
+
 const props = defineProps({
 	iconSize: {
 		type: String as PropType<IconSize>,
@@ -23,6 +24,10 @@ const props = defineProps({
 	fileType: {
 		type: String,
 		default: 'file' // file directory
+	},
+	disabled: {
+		type: Boolean,
+		default: false
 	}
 })
 
@@ -32,13 +37,13 @@ const emits = defineEmits(['onChange'])
 const openFile = async () => {
 	if (props.fileType === 'file') {
 		const filePath = await window.electronAPI.openFile()
-		emits('onChange', filePath)
+		emits('onChange', filePath[0])
 		return
 	}
 
 	if (props.fileType === 'directory') {
 		const filePath = await window.electronAPI.openFileDirectory()
-		emits('onChange', filePath)
+		emits('onChange', filePath[0])
 		return
 	}
 }
@@ -46,10 +51,16 @@ const openFile = async () => {
 
 <template>
 	<div class="upload-file">
-		<n-button strong secondary circle type="info" :size="props.iconSize">
-			<template #icon>
-				<n-icon :component="CloudUpload" @click="openFile" />
+		<n-popover :disabled="props.disabled">
+			<template #trigger>
+				<n-button strong secondary circle type="info" :size="props.iconSize" :disabled="props.disabled"
+					@click="openFile">
+					<template #icon>
+						<n-icon :component="CloudUpload" />
+					</template>
+				</n-button>
 			</template>
-		</n-button>
+			<span>点击上传水印图片</span>
+		</n-popover>
 	</div>
 </template>

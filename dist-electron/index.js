@@ -13,6 +13,7 @@ const createWindow = () => {
     height: 600,
     minWidth: 1080,
     minHeight: 640,
+    icon: join(app.getAppPath(), "/electron/assets/logo.png"),
     show: false,
     // frame: false,
     titleBarStyle: "hidden",

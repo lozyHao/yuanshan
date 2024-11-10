@@ -1,55 +1,47 @@
-import { Base64 } from 'some-library';
 
+/** 获取图片的 imageBitmap*/
+export async function getImageBitmap(url: string | File): Promise<{ image: ImageBitmap, width: number, height: number } | null> {
+	if (!url) return null
+	const img = new Image();
+	if (typeof url === 'string') {
+		img.src = url;
+	} else {
+		img.src = URL.createObjectURL(url);
+	}
 
-// 通过图片获取到地址 Blob
-export const getImgSrcBlob = (file: File | null) => {
-	if (!file) return ''
-	// 判断是否是空对象
-	console.log(file)
-	return URL.createObjectURL(file);
-};
-
-// Base64
-export const getImgBase64 = async (file: File | null) => {
-	if (!file) return ''
-	const reader = new FileReader();
-	reader.readAsDataURL(file);
-	return new Promise((resolve) => {
-		reader.onload = () => {
-			resolve(reader.result);
+	return await new Promise<{ image: ImageBitmap, width: number, height: number } | null>((resolve) => {
+		img.onload = async () => {
+			const imageBitmap = await createImageBitmap(img);
+			const { width, height } = imageBitmap
+			resolve({ image: imageBitmap, width, height });
 		};
-		reader.onerror = () => {
-			resolve('');
-		};
-	});
-}
 
-// 读取 Base64 图片
-export const getImgSrc = async (file: Base64 | null) => {
-	if (!file) return null
-	return URL.createObjectURL(file);
+		img.onerror = () => {
+			resolve(null);
+		}
+	})
 }
 
 
-// 文件转base64
-export async function fileToHash(file: File) {
-	const reader = new FileReader();
-	const arrayBuffer = await new Promise((resolve, reject) => {
-		reader.onload = (e) => resolve(e.target.result);
-		reader.onerror = reject;
-		reader.readAsArrayBuffer(file);
+/** 字体加载 */
+export async function loadFont(fonts: { value: string, key: string }[]) {
+	const fontPromises = fonts.map(font => {
+		const myFont = new FontFace(`${font.value}`, `url(${font.key})`);
+		return new Promise((resolve, reject) => {
+			myFont.load().then(fontFace => {
+				document.fonts.add(fontFace);
+				resolve(true);
+			}).catch(error => {
+				reject({ key: font.key, error });
+			});
+		});
 	});
 
-	const buffer = new Uint8Array(arrayBuffer);
-	const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
-	const hashArray = Array.from(new Uint8Array(hashBuffer));
-	const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-	return hashHex;
-}
-
-// 判断文件是否相同
-export async function areFilesSame(file1: File, file2: File) {
-	const hash1 = await fileToHash(file1);
-	const hash2 = await fileToHash(file2);
-	return hash1 === hash2;
+	try {
+		await Promise.all(fontPromises);
+		return true;
+	} catch (error) {
+		console.error('字体加载失败', error);
+		return false;
+	}
 }

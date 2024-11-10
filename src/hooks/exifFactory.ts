@@ -3,7 +3,7 @@ import * as Exifreader from "exifreader";
 import { exifFields } from "@/default/default-options";
 
 
-interface Exif {
+export interface Exif {
 	// 不能用any
 	[key: string]: {
 		id?: number,
@@ -12,7 +12,7 @@ interface Exif {
 	};
 }
 
-interface ExifData {
+export interface ExifData {
 	[key: string]: string | null
 }
 
@@ -31,8 +31,8 @@ class ExifFactory {
 	// 获取图片的exif信息
 	async load(file: File): Promise<ExifData> {
 		const exif: Exif = await Exifreader.load(file);
-
 		const result: ExifData = this.getExif(exif);
+		console.log("exif", result)
 		this.exif = result;
 		return result;
 	}
@@ -44,8 +44,10 @@ class ExifFactory {
 
 		for (let i = 0; i < exifFields.length; i++) {
 			const key = exifFields[i].key
-
-			// 校验这个key在exif上是否存在
+			if (!key) {
+				continue
+			}
+			// 校验这个key在exif上是否存在	
 			if (Object.prototype.hasOwnProperty.call(exif, key)) {
 				exifData[key] = exif[key]?.description || null;
 			} else {
@@ -55,12 +57,27 @@ class ExifFactory {
 		return exifData;
 	}
 
+	// 将exif 数据格式化 {名称，值}
+	getExifJSON(exif: ExifData): { name: string; value: string }[] {
+		const list = []
+		for (const key in exif) {
+			const e = exifFields.find(item => item.key === key)
+			if (e) {
+				list.push({
+					name: e.name as string,
+					value: this.get(key) as string
+				})
+			}
+		}
+		return list
+	}
+
 
 	// 获取对应的数据
 	get(key: string) {
 		const data = this.exif[key];
 		if (key === 'Image Height' || key === 'Image Width') {
-			return Number(data);
+			return Number(data?.replace('px', ''));
 		}
 		if (key === 'Make') {
 			// 去掉第一个空格之后的内容 NIKON CORPORATION => NIKON
@@ -68,11 +85,19 @@ class ExifFactory {
 		}
 		if (key === 'Model') {
 			// 去掉第一个空格之前的内容 NIKON Z 6_2 => Z 6_2
-			return data?.replace(data?.split(' ')[0] + ' ', '');
+			return data?.replace(data?.split(' ')[0] + ' ', '').replace("_", "·").replace(/[Zz]/g, 'ℤ');
 		}
 		if (key === 'FocalLength') {
 			// 去掉空格 56 mm => 56mm
 			return data?.replace(' ', '');
+		}
+		if (key === 'ISOSpeedRatings') {
+			// 100 => ISO100
+			return `ISO${data}`
+		}
+		if (key === 'LensModel') {
+			// 去除镜头厂商
+			return data?.replace(data?.split(' ')[0] + ' ', '');
 		}
 		return data;
 	}

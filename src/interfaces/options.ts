@@ -1,18 +1,9 @@
-// 通用配置
-export enum OptionDefaultEnum {
-	// 通用配置
-	OUTPUT_PATH = "outputPath", // 输出目录
-}
-
-export interface OptionDefaultValues {
-	[OptionDefaultEnum.OUTPUT_PATH]: string;
-}
-
 /**
  * 照片边框
  */
 // 基础配置
 export enum OptionBasicEnum {
+	OUTPUT_PATH = "outputPath", // 输出目录
 	PATTERN = "pattern", // 模式
 	MAIN_IMG_SIZE = "mainImgSize", // 主图尺寸
 	TEXT_BG_COLOR = "textBgColor", // 文字背景
@@ -20,6 +11,7 @@ export enum OptionBasicEnum {
 	WATERMARK = "watermark", // 图片水印
 	WATERMARK_POSITION = "watermarkPosition", // 水印位置
 	WATERMARK_USED = "watermarkUsed", // 水印是否启用
+	WATERMARK_SIZE = "watermarkSize", // 水印尺寸
 	ROUNDED_SIZE = "roundedSize", // 圆角
 	SHADOW_SIZE = "shadowSize", // 阴影大小
 	BG_COLOR = "bgColor", // 背景颜色纯色
@@ -31,13 +23,15 @@ export enum OptionBasicEnum {
 }
 
 export interface OptionBasicValues {
+	[OptionBasicEnum.OUTPUT_PATH]: string;
 	[OptionBasicEnum.PATTERN]: OptionPatternEnum;
 	[OptionBasicEnum.MAIN_IMG_SIZE]: number;
 	[OptionBasicEnum.TEXT_BG_COLOR]: string;
 	[OptionBasicEnum.TEXT_BG_COLOR_USED]: boolean;
-	[OptionBasicEnum.WATERMARK]?: string | null;
+	[OptionBasicEnum.WATERMARK]?: ImageBitmap | string | null;
 	[OptionBasicEnum.WATERMARK_POSITION]?: WatermarkPositionEnum;
 	[OptionBasicEnum.WATERMARK_USED]?: boolean;
+	[OptionBasicEnum.WATERMARK_SIZE]?: number;
 	[OptionBasicEnum.ROUNDED_SIZE]: number;
 	[OptionBasicEnum.SHADOW_SIZE]: number;
 	[OptionBasicEnum.BG_COLOR]?: string;
@@ -63,15 +57,15 @@ export enum OptionTextTemplateEnum {
 }
 
 export interface OptionTextTemplateValues {
-	[OptionTextTemplateEnum.KEY]: string;
+	[OptionTextTemplateEnum.KEY]: string | null;
 	[OptionTextTemplateEnum.TYPE]: number;
-	[OptionTextTemplateEnum.NAME]: string;
-	[OptionTextTemplateEnum.CONTENT]?: string;
-	[OptionTextTemplateEnum.FONT]?: string;
-	[OptionTextTemplateEnum.SIZE]?: number;
-	[OptionTextTemplateEnum.COLOR]?: string;
-	[OptionTextTemplateEnum.ITALIC]?: boolean;
-	[OptionTextTemplateEnum.BOLD]?: boolean;
+	[OptionTextTemplateEnum.NAME]: string | null;
+	[OptionTextTemplateEnum.CONTENT]: Array<string> | null;
+	[OptionTextTemplateEnum.FONT]: string;
+	[OptionTextTemplateEnum.SIZE]: number;
+	[OptionTextTemplateEnum.COLOR]: string;
+	[OptionTextTemplateEnum.ITALIC]: boolean;
+	[OptionTextTemplateEnum.BOLD]: boolean;
 	[OptionTextTemplateEnum.position]: TextTemplatePositionEnum;
 }
 
@@ -83,33 +77,33 @@ export enum OptionLensEnum {
 	CONTENT_TYPE = "contentType", // 内容类型 0-文本 1-图片
 	CONTENT_TEXT = "contentText", // 文本
 	CONTENT_IMAGE = "contentImage", // 图片
-	FORCED_USED = "forcedUsed", // 强制使用
 	FONT = "font", // 字体
-	FONT_USED = "fontUsed", // 字体是否启用
 	SIZE = "size", // 字号
 	COLOR = "color", // 颜色
 	ITALIC = "italic", // 斜体
 	BOLD = "bold", // 粗体
 	USED = "used", // 是否启用
-	DISCRIPTION = "description", // 描述/填充模板内容
+	FORCED_USED = "forcedUsed", // 强制使用
+	DESCRIPTION = "description", // 描述/填充模板内容
+	SHOW = "show", // 是否显示
 }
 
 export interface OptionLensValues {
-	[OptionLensEnum.KEY]: string;
+	[OptionLensEnum.KEY]: string | null;
 	[OptionLensEnum.TYPE]: number;
 	[OptionLensEnum.NAME]: string | null;
 	[OptionLensEnum.CONTENT_TYPE]?: number;
 	[OptionLensEnum.CONTENT_TEXT]?: string | null;
-	[OptionLensEnum.CONTENT_IMAGE]?: File | null;
-	[OptionLensEnum.FORCED_USED]: boolean;
+	[OptionLensEnum.CONTENT_IMAGE]?: string | null;
 	[OptionLensEnum.FONT]?: string | null;
-	[OptionLensEnum.FONT_USED]?: boolean;
-	[OptionLensEnum.SIZE]?: number;
-	[OptionLensEnum.COLOR]?: string;
-	[OptionLensEnum.ITALIC]?: boolean;
-	[OptionLensEnum.BOLD]?: boolean;
-	[OptionLensEnum.USED]?: boolean;
-	[OptionLensEnum.DISCRIPTION]?: string;
+	[OptionLensEnum.SIZE]?: number | null;
+	[OptionLensEnum.COLOR]?: string | null;
+	[OptionLensEnum.ITALIC]?: boolean | null;
+	[OptionLensEnum.BOLD]?: boolean | null;
+	[OptionLensEnum.USED]?: boolean | null;
+	[OptionLensEnum.FORCED_USED]?: boolean | null;
+	[OptionLensEnum.DESCRIPTION]: string | null;
+	[OptionLensEnum.SHOW]?: boolean | null;
 }
 
 /**
@@ -134,9 +128,9 @@ export enum WatermarkPositionEnum {
 
 // 文本模板位置
 export enum TextTemplatePositionEnum {
-	HEADER = "header",
-	MIDDLE = "middle",
-	FOOTER = "footer",
+	HEADER = "left",
+	MIDDLE = "center",
+	FOOTER = "right",
 	NO = "no",
 }
 
@@ -161,4 +155,84 @@ export enum IconSize {
 	Small = 'small',
 	Medium = 'medium',
 	Large = 'large'
+}
+
+
+/** canvas 绘制方法参数配置 */
+export type Position = "center" | "left" | "right";
+export type Mode = "in" | "out" // 模式（边框所在位置，内侧还是外侧）
+
+export type ImageBitmap = {
+	height: number,
+	width: number,
+	close: () => void
+}
+
+// 绘制纯色
+export type FillRectType = {
+	color?: string,
+	width: number,
+	height: number,
+	x?: number,
+	y?: number,
+}
+
+// 绘制文字
+export type FileTextType = {
+	text: string,
+	font?: string,
+	size: number,
+	color: string,
+	italic: boolean,
+	bold: boolean,
+	textAlign?: "left" | "center" | "right",
+	x: number,
+	y: number,
+}
+
+// 绘制图片
+export type DrawImageType = {
+	image: ImageBitmap, // 解析的 imageBitmap
+	width: number,
+	height: number,
+	x: number,
+	y: number,
+}
+
+// 绘制高斯模糊图片
+export type BlurImageType = {
+	image: ImageBitmap, // 解析的 imageBitmap
+	width?: number,
+	height?: number,
+	x?: number,
+	y?: number,
+	blur?: number
+}
+
+// 绘制主图（圆角+投影）
+export type DrawMainImageType = {
+	image: ImageBitmap, // 解析的 imageBitmap
+	width?: number,
+	height?: number,
+	ratio?: number, // 图占比 50-100
+	radius?: number, // 圆角 0-50
+	shadow?: number // 阴影 0.1-1
+}
+
+// 图文结合绘制
+export type ImageTextItem = {
+	type: number, // 0 文字 1 图片
+	content: ImageBitmap | string,
+	width?: number,
+	height?: number,
+	size: number, // 字号/图片尺寸 0.2 - 0.9
+	font?: string,
+	color: string,
+	italic?: boolean,
+	bold?: boolean,
+}
+export type ImageTextType = {
+	items: ImageTextItem[];
+	x: Position,
+	yPosition: number
 }

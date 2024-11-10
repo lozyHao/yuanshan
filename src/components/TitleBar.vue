@@ -6,18 +6,23 @@ import {
 	QuestionCircle24Regular,
 	Star24Regular,
 } from "@vicons/fluent";
-import { OptionsOutline } from "@vicons/ionicons5";
+import { ClearOutlined } from '@vicons/antd'
 
 import { computed, ref } from "vue";
 
 import { useThemeStore } from "@/store/theme.ts";
-
-import OptionBox from "./OptionDefault.vue";
-
-// 配置弹窗
-const showOptionBox = ref<boolean>(false);
+import { useOptionBasicStore } from '@/store/optionBasic.ts'
+import { useOptionTextStore } from '@/store/optionText.ts'
+import { useOptionLensStore } from '@/store/optionLens.ts'
+import { useMessage } from "naive-ui";
 
 const themeStore = useThemeStore();
+const basicStore = useOptionBasicStore()
+const textStore = useOptionTextStore()
+const lensStore = useOptionLensStore()
+
+const message = useMessage()
+
 const translateY = computed(() => {
 	if (themeStore.isDark()) {
 		return "translate-y-0";
@@ -28,6 +33,26 @@ const translateY = computed(() => {
 const onChange = () => {
 	themeStore.setTheme();
 };
+
+// 清除数据
+const options = ref(["basic", "text", "lens"])
+
+const onClear = () => {
+	for (let i = 0; i < options.value.length; i++) {
+		switch (options.value[i]) {
+			case "basic":
+				basicStore.reset()
+				break;
+			case "text":
+				textStore.reset()
+				break;
+			case "lens":
+				lensStore.reset()
+				break;
+		}
+	}
+	message.success("恢复成功")
+}
 </script>
 <template>
 	<div class="title-bar flex-between w-full h-full">
@@ -39,14 +64,32 @@ const onChange = () => {
 		<div class="flex-center">
 			<n-popover trigger="hover" :show-arrow="false">
 				<template #trigger>
-					<div class="flex-center menu-hover h-12 w-12 color3 cursor-pointer transition-all"
-						@click="showOptionBox = true">
-						<n-icon :size="20">
-							<OptionsOutline />
+					<div class="flex-center menu-hover w-12 h-12 cursor-pointer transition-all">
+						<n-icon class="color3" :size="20">
+							<ClearOutlined />
 						</n-icon>
 					</div>
 				</template>
-				<span>通用配置</span>
+				<n-checkbox-group v-model:value="options">
+					<n-grid class="py-2" :y-gap="8" :cols="3">
+						<n-gi :span="2" class="flex-center">
+							<span class="text-sm color6">清空所有配置项，恢复到初始默认配置</span>
+						</n-gi>
+						<n-gi :span="1" class="flex-end">
+							<n-button type="warning" size="tiny" @click="onClear">恢复默认</n-button>
+						</n-gi>
+						<n-gi>
+							<n-checkbox value="basic" size="small" label="基础配置" />
+						</n-gi>
+						<n-gi>
+							<n-checkbox value="text" size="small" label="文字模板" />
+						</n-gi>
+						<n-gi>
+							<n-checkbox value="lens" size="small" label="相机参数" />
+						</n-gi>
+
+					</n-grid>
+				</n-checkbox-group>
 			</n-popover>
 			<n-popover trigger="hover" :show-arrow="false">
 				<template #trigger>
@@ -92,8 +135,6 @@ const onChange = () => {
 				</div>
 			</n-popover>
 		</div>
-
-		<option-box v-model:show="showOptionBox"></option-box>
 	</div>
 </template>
 

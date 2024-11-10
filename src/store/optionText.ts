@@ -21,17 +21,14 @@ export const useOptionTextStore = defineStore(
 	() => {
 		const _data = ref<OptionTextTemplateValues[]>([...defTextTemps]);
 
-
-		// 添加校验，校验可以是否存在
-		const checkEdit = (key: string): boolean => {
-			const data = _data.value.find((item: OptionTextTemplateValues) => item.key === key);
-			return !!data;
-		}
-
 		// 添加
-		const add = (option: OptionTextTemplateValues) => {
+		const add = (option: OptionTextTemplateValues): { status: boolean, msg: string } => {
+			if (_data.value.length >= 12) {
+				return { status: false, msg: "最多添加 10 项" };
+			}
 			option.key = getUUID();
 			_data.value.push(option);
+			return { status: true, msg: "添加成功" };
 		};
 
 		// 获取
@@ -136,16 +133,22 @@ export const useOptionTextStore = defineStore(
 			);
 		};
 
+
+		// 恢复默认
+		const reset = () => {
+			_data.value = [...defTextTemps];
+		};
+
 		return {
 			_data,
 			get,
-			checkEdit,
 			add,
 			changePosition,
 			changeOrder,
 			remove,
 			edit,
 			del,
+			reset
 		};
 	},
 	{

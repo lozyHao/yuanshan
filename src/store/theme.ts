@@ -3,16 +3,16 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { darkTheme } from 'naive-ui'
 
-import { ThemeEnum } from '@/interfaces/theme.ts'
+import { BuiltInGlobalTheme } from 'naive-ui/es/themes/interface'
 
 /**
  * 主题
  */
 export const useThemeStore = defineStore('theme', () => {
-	const theme = ref<ThemeEnum | null>(null)
+	const theme = ref<BuiltInGlobalTheme | null>(null)
 	const setTheme = () => {
 		theme.value = theme.value === null ? darkTheme : null
-		console.log(theme.value)
+
 		setBodyClass()
 	}
 

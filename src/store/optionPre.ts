@@ -1,9 +1,6 @@
 import { ref } from 'vue'
 
 import { defineStore } from 'pinia'
-import { darkTheme } from 'naive-ui'
-
-import { Theme } from '@/interfaces/theme.ts'
 import { ThemeEnum } from '@/interfaces/theme.ts'
 
 /**
@@ -12,8 +9,6 @@ import { ThemeEnum } from '@/interfaces/theme.ts'
 export const useThemeStore = defineStore('theme', () => {
 	const theme = ref<ThemeEnum | null>(null)
 	const setTheme = () => {
-		theme.value = theme.value === null ? darkTheme : null
-		console.log(theme.value)
 		setBodyClass()
 	}
 

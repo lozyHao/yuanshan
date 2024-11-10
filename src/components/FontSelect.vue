@@ -7,6 +7,10 @@ const props = defineProps({
 	font: {
 		type: String as PropType<string | null>,
 		default: null,
+	},
+	disabled: {
+		type: Boolean,
+		default: false
 	}
 })
 
@@ -15,12 +19,12 @@ const emits = defineEmits(["update:font"])
 const selectedFont = ref(props.font)
 watch(() => props.font, () => {
 	selectedFont.value = props.font
-	console.log(selectedFont.value)
 })
 </script>
 
 <template>
 	<div class="font-select flex-1">
-		<n-select v-model:value="selectedFont" :options="fontOptions" @update:value="emits('update:font', $event)" />
+		<n-select v-model:value="selectedFont" :options="fontOptions" :disabled="props.disabled"
+			@update:value="emits('update:font', $event)" />
 	</div>
 </template>

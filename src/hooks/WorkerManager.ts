@@ -12,9 +12,6 @@ class WorkerManager {
 		worker.onmessage = (event) => {
 			if (event.data.callbackId && this.callbacks[event.data.callbackId]) {
 				this.callbacks[event.data.callbackId](event.data.result);
-				delete this.callbacks[event.data.callbackId]; // 执行完毕后删除回调函数
-				// 结束后，删除该 worker
-				this.terminateWorker(workerName);
 			}
 		};
 
@@ -28,7 +25,7 @@ class WorkerManager {
 
 	postMessage(workerName: string, message: any, callback: (result: any) => void) {
 		const worker = this.workers[workerName];
-		const callbackId = workerName;
+		const callbackId = Math.random().toString(36).slice(2);
 
 		if (worker && callback) {
 			this.callbacks[callbackId] = callback;
@@ -42,6 +39,12 @@ class WorkerManager {
 			worker.terminate();
 			delete this.workers[workerName];
 		}
+	}
+
+	delete(workerName: string) {
+		// delete this.callbacks[event.data.callbackId]; // 执行完毕后删除回调函数
+		// 结束后，删除该 worker
+		this.terminateWorker(workerName);
 	}
 }
 
