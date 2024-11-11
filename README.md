@@ -1,7 +1,34 @@
-# Vue 3 + TypeScript + Vite
+# yuanshan
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+An Electron application with Vue and TypeScript
 
-Learn more about the recommended Project Setup and IDE Support in the [Vue Docs TypeScript Guide](https://vuejs.org/guide/typescript/overview.html#project-setup).
+## Recommended IDE Setup
 
-## 技术栈
+- [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin)
+
+## Project Setup
+
+### Install
+
+```bash
+$ npm install
+```
+
+### Development
+
+```bash
+$ npm run dev
+```
+
+### Build
+
+```bash
+# For windows
+$ npm run build:win
+
+# For macOS
+$ npm run build:mac
+
+# For Linux
+$ npm run build:linux
+```
