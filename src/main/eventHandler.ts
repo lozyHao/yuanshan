@@ -1,9 +1,7 @@
-import { ipcMain, dialog, shell } from 'electron'
+import { app, ipcMain, dialog, shell } from 'electron'
 import path from 'path'
 import fs from 'fs'
-import { Buffer } from 'buffer'
-
-// import taskQueueManager from './taskQueueManager.js'
+import sharp from 'sharp'
 
 const start = () => {
   ipcMain.handle('dialog:openFile', handleFileOpen)
@@ -11,7 +9,7 @@ const start = () => {
   ipcMain.handle('dialog:openFileDirectory', handleFileOpenDirectory)
 
   ipcMain.on('dialog:openFileDirectoryByPath', handleFileOpenDirectoryByPath)
-  ipcMain.on('files-to-save', handleSaveFiles)
+  ipcMain.handle('files-to-save', async (_event, params) => await handleSaveFiles(params))
 }
 
 // 事件处理
@@ -21,15 +19,31 @@ const handleFileOpen = async () => {
   const { canceled, filePaths } = await dialog.showOpenDialog({
     properties: ['openFile']
   })
-  if (!canceled) {
-    // TODO: 将文件存储在本地指定目录，并返回文件路径（绝对路径）
-    const dir = 'temp/'
-    // 存储文件到项目目录下的temp目录
-    // 修改文件名称，拼接时间戳
-    const savedPaths = await saveFilesToDirectory(filePaths, dir)
-    return savedPaths
+
+  if (canceled) {
+    return { status: false, msg: '已取消', fileDir: [] }
   }
-  return null
+
+  // 获取应用的安装目录路径
+  const appPath = app.getPath('appData') // 或者使用 'userData'，取决于您的需求
+  const tempDir = path.join(appPath, 'yuanshan/temp')
+  // 确保临时目录存在
+  await fs.promises.mkdir(tempDir, { recursive: true })
+
+  try {
+    const uploadedFiles = await Promise.all(
+      filePaths.map(async (srcPath) => {
+        const fileName = path.basename(srcPath)
+        const destPath = path.join(tempDir, fileName)
+        await fs.promises.copyFile(srcPath, destPath)
+        return destPath
+      })
+    )
+
+    return { status: true, msg: '成功', fileDir: uploadedFiles }
+  } catch (error: any) {
+    return { status: false, msg: '失败', fileDir: null }
+  }
 }
 
 /** 多文件选择 */
@@ -60,59 +74,35 @@ const handleFileOpenDirectoryByPath = async (event, filePath) => {
   shell.showItemInFolder(filePath)
 }
 
-// 保存文件到指定目录并返回保存后的绝对路径
-async function saveFilesToDirectory(filePaths, directory) {
-  const savedPaths: string[] = []
-  for (const filePath of filePaths) {
-    const fileName = path.basename(filePath)
-    const destPath = path.join(directory, fileName)
-
-    await fs.promises.copyFile(filePath, destPath)
-    savedPaths.push(destPath)
-  }
-  return savedPaths
-}
-
 // 保存文件
-const handleSaveFiles = async (event, base64DataList) => {
-  base64DataList.forEach((data, index) => {
-    const task = saveFile(data, index, event)
-    // taskQueueManager.addTask(task)
-    console.log(task)
-  })
-}
+const handleSaveFiles = async (params: {
+  imageArrayBuffer: ArrayBuffer
+  width: number
+  height: number
+  dir: string
+  quality: number
+}) => {
+  const { imageArrayBuffer, width, dir, quality = 100 } = params
 
-// 保存文件的函数
-const saveFile = (data, index, event) => {
-  return new Promise((resolve, reject) => {
-    const filePath = path.join('path/', `${index}.png`)
-    const buffer = Buffer.from(data.split(',')[1], 'base64')
-    fs.writeFile(filePath, buffer, (err) => {
-      if (err) {
-        event.reply('file-save-result', {
-          message: `文件${index}保存失败: ${err.message}`,
-          type: 'error'
-        })
-        reject(err)
-      } else {
-        event.reply('file-save-result', {
-          message: `文件${index}保存成功`,
-          type: 'success'
-        })
+  //   确保临时目录存在
+  if (!fs.existsSync(dir)) {
+    await fs.promises.mkdir(dir, { recursive: true })
+  }
+
+  // eslint-disable-next-line no-async-promise-executor
+  return await new Promise(async (resolve) => {
+    await sharp(imageArrayBuffer)
+      .resize(Math.floor(width * (quality / 100)))
+      .toFile(`${dir}/${Date.now()}.png`)
+      .then((success) => {
+        console.log('保存成功', success)
         resolve(true)
-      }
-    })
+      })
+      .catch((error) => {
+        console.log('保存失败', error)
+        resolve(false)
+      })
   })
 }
-
-// // 监听所有任务完成事件
-// taskQueueManager.on('allTasksCompleted', () => {
-//   console.log('所有任务完成')
-
-//   ipcMain.send('file-save-result', {
-//     message: `文件保存结束`,
-//     type: 'end'
-//   })
-// })
 
 export default start

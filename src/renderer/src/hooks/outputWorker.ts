@@ -1,15 +1,16 @@
 // worker.ts
 self.onmessage = async (event) => {
-  const { params, image, width, height, callbackId } = event.data
-  const result = await draw(params, image, width, height, callbackId)
+  const { params, image, width, height, type, callbackId } = event.data
+  const result = await outPut(params, image, width, height, type, callbackId)
   postMessage({ result, callbackId })
 }
 
-const draw = async (
+const outPut = async (
   params: any,
   image: ImageBitmap,
   width: number,
   height: number,
+  type: string = 'preview',
   callbackId: string
 ) => {
   const { basic, textList } = params
@@ -100,10 +101,15 @@ const draw = async (
       })
     }
   }
-  postMessage({ result: 95, callbackId })
 
-  const imageDataURL = await canvasDraw.getBlob()
-  postMessage({ result: 100, callbackId })
+  let imageDataURL: Blob | ImageBitmap
+  if (type === 'preview') {
+    imageDataURL = await canvasDraw.getBlob()
+    postMessage({ result: 100, callbackId })
+  } else {
+    imageDataURL = await canvasDraw.getBlob()
+    postMessage({ result: 95, callbackId })
+  }
 
   return imageDataURL
 }

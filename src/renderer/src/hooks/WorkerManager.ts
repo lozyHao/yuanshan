@@ -7,8 +7,8 @@ class WorkerManager {
     this.workers = {}
   }
 
-  createWorker(workerName: string, workerScript: string) {
-    const worker = new Worker(workerScript)
+  createWorker(workerName: string, DefinedWorker: any) {
+    const worker = new DefinedWorker()
     worker.onmessage = (event) => {
       if (event.data.callbackId && this.callbacks[event.data.callbackId]) {
         this.callbacks[event.data.callbackId](event.data.result)

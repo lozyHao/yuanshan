@@ -4,12 +4,15 @@ import { defineStore } from 'pinia'
 import ImageData from '@renderer/hooks/imageData'
 import WorkerManager from '@renderer/hooks/WorkerManager'
 import { getParams } from '@renderer/hooks/paramsUtils'
+import TaskQueue from '@renderer/hooks/taskQueue'
 
 import {
   OptionBasicValues,
   OptionTextTemplateValues,
   OptionLensValues
 } from '@renderer/interfaces/options'
+
+import FileWorker from '@renderer/hooks/fileWorker.ts?worker'
 
 /**
  * 处理的文件列表
@@ -28,7 +31,7 @@ export const useFileStore = defineStore('file', () => {
       const currentFiles = [...(_imageData.value?.map((item) => item.file) || [])]
 
       const worker = new WorkerManager()
-      worker.createWorker('addFiles', new URL('../hooks/worker', import.meta.url).href)
+      worker.createWorker('addFiles', FileWorker)
       worker.postMessage(
         'addFiles',
         { data: files, currentFiles: currentFiles },
@@ -40,8 +43,10 @@ export const useFileStore = defineStore('file', () => {
               _imageData.value.push(new ImageData(file))
             })
           }
-          _loading.value = false
-          resolve(str)
+          setTimeout(() => {
+            _loading.value = false
+            resolve(str)
+          }, 1000)
         }
       )
     })
@@ -72,7 +77,32 @@ export const useFileStore = defineStore('file', () => {
       lens
     })
     // 开启预览
-    _imageData.value[_currentPreIndex.value].startPreview(data)
+    _imageData.value[_currentPreIndex.value].onPrint(data)
+  }
+
+  // 开始输出
+  const startOutput = async (options: {
+    basic: OptionBasicValues
+    text: OptionTextTemplateValues[]
+    lens: OptionLensValues[]
+  }) => {
+    const { basic, text, lens } = options
+    const data = await getParams({
+      exif: _imageData.value[_currentPreIndex.value].exif,
+      basic,
+      text,
+      lens
+    })
+    //    通过并发量控制
+    const taskQueue = new TaskQueue(3)
+
+    // 添加任务
+    for (let i = 1; i <= fileLength.value; i++) {
+      taskQueue.addTask(async () => await _imageData.value[i - 1].onPrint(data, 'output'))
+    }
+
+    // 启动任务队列
+    taskQueue.start()
   }
 
   // 重置清空
@@ -95,6 +125,7 @@ export const useFileStore = defineStore('file', () => {
     removeFile,
     getFile,
     startPreview,
+    startOutput,
     reset,
     setCurrentPreIndex
   }

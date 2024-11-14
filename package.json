@@ -12,19 +12,19 @@
     "typecheck:web": "vue-tsc --noEmit -p tsconfig.web.json --composite false",
     "typecheck": "npm run typecheck:node && npm run typecheck:web",
     "start": "electron-vite preview",
-    "dev": "electron-vite dev",
+    "dev": "electron-vite dev -w",
     "build": "npm run typecheck && electron-vite build",
     "postinstall": "electron-builder install-app-deps",
     "build:unpack": "npm run build && electron-builder --dir",
     "build:win": "npm run build && electron-builder --win",
     "build:mac": "npm run build && electron-builder --mac",
-    "build:linux": "npm run build && electron-builder --linux",
-    "generate-icons": "electron-icon-builder --input=./resources/icon.png --output=build --flatten"
+    "build:linux": "npm run build && electron-builder --linux"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.0",
     "@electron-toolkit/utils": "^3.0.0",
     "electron-updater": "^6.1.7",
+    "sharp": "^0.33.5",
     "unplugin-auto-import": "^0.18.3",
     "unplugin-vue-components": "^0.27.4"
   },
@@ -53,7 +53,6 @@
     "events": "^3.3.0",
     "exifreader": "^4.24.0",
     "html2canvas": "^1.4.1",
-    "jimp": "^1.6.0",
     "less": "^4.2.0",
     "less-loader": "^12.2.0",
     "naive-ui": "^2.40.1",
@@ -66,6 +65,7 @@
     "uuid": "^11.0.2",
     "vite": "^5.3.1",
     "vue": "^3.4.30",
-    "vue-tsc": "^2.0.22"
+    "vue-tsc": "^2.0.22",
+    "worker-loader": "^3.0.8"
   }
 }

@@ -6,11 +6,17 @@ const api = {
   openFile: () => ipcRenderer.invoke('dialog:openFile'),
   openFileMulti: () => ipcRenderer.invoke('dialog:openFileMulti'),
   openFileDirectory: () => ipcRenderer.invoke('dialog:openFileDirectory'),
+
   openFileDirectoryByPath: (filePath: string) =>
     ipcRenderer.send('dialog:openFileDirectoryByPath', filePath),
-  sendSaveFile: (value: string) => ipcRenderer.send('files-to-save', value),
-  getSaveFileResult: (callback: (value: string) => void) =>
-    ipcRenderer.on('file-save-result', (_event, value) => callback(value))
+
+  sendSaveFile: (params: {
+    imageArrayBuffer: ArrayBuffer
+    width: number
+    height: number
+    dir: string
+    quality: number
+  }) => ipcRenderer.invoke('files-to-save', params)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
@@ -19,7 +25,7 @@ const api = {
 if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld('electron', electronAPI)
-    contextBridge.exposeInMainWorld('api', api)
+    contextBridge.exposeInMainWorld('api', { ...api })
   } catch (error) {
     console.error(error)
   }

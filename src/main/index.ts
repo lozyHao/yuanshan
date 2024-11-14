@@ -1,11 +1,14 @@
-import { app, shell, BrowserWindow, ipcMain, dialog, protocol } from 'electron'
-import { join, basename } from 'path'
+import { app, shell, BrowserWindow, ipcMain, protocol } from 'electron'
+import { join } from 'path'
 import { promises as fs } from 'fs'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 
 import start from './eventHandler'
 
 import icon from '../../resources/icon.png?asset'
+
+// 禁用安全警告
+process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
 
 // 注册自定义协议方案
 protocol.registerSchemesAsPrivileged([
@@ -21,22 +24,21 @@ protocol.registerSchemesAsPrivileged([
   }
 ])
 
-// 获取应用的安装目录路径
-const appPath = app.getPath('appData') // 或者使用 'userData'，取决于您的需求
-const tempDir = join(appPath, 'yuanshan/temp')
-
-// 确保临时目录存在
-;(async () => {
-  await fs.mkdir(tempDir, { recursive: true })
-})()
-
 function createWindow(): void {
   // 创建浏览器窗口
   const mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 700,
+    width: 1080,
+    height: 600,
+    minWidth: 1080,
+    minHeight: 640,
     show: false,
-    // autoHideMenuBar: true,
+    autoHideMenuBar: true,
+    titleBarStyle: 'hidden',
+    titleBarOverlay: {
+      color: '#ffffff00',
+      symbolColor: '#999',
+      height: 40
+    },
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
@@ -115,32 +117,5 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
-  }
-})
-
-// 监听渲染进程发送的上传文件请求
-ipcMain.on('upload-files', async (event) => {
-  const { canceled, filePaths } = await dialog.showOpenDialog({
-    properties: ['openFile', 'multiSelections']
-  })
-
-  if (canceled) {
-    event.reply('upload-files', { success: false, message: 'No files were selected' })
-    return
-  }
-
-  try {
-    const uploadedFiles = await Promise.all(
-      filePaths.map(async (srcPath) => {
-        const fileName = basename(srcPath)
-        const destPath = join(tempDir, fileName)
-        await fs.copyFile(srcPath, destPath)
-        return destPath
-      })
-    )
-
-    event.reply('upload-files', { success: true, files: uploadedFiles })
-  } catch (error: any) {
-    event.reply('upload-files', { success: false, message: error.message })
   }
 })

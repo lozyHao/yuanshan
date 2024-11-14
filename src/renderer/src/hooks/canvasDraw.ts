@@ -502,11 +502,10 @@ class CanvasDraw {
   }
 
   /**
-   * 获取地址
+   * 获取 ImageBitmap
    */
-  async getDataURL() {
-    const blob = await this.canvas.convertToBlob()
-    return URL.createObjectURL(blob)
+  async getImageBitmap() {
+    return this.canvas.transferToImageBitmap()
   }
 
   /**
