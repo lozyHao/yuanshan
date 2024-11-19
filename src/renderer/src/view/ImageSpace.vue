@@ -7,7 +7,7 @@ import {
 } from "@vicons/fluent";
 import { CloudUpload } from "@vicons/tabler";
 
-import { computed, ref } from "vue";
+import { computed, ref, onMounted } from "vue";
 import { useMessage, useDialog } from "naive-ui";
 
 import ImageData from "@renderer/hooks/imageData";
@@ -16,16 +16,15 @@ import { useOptionBasicStore } from "@renderer/store/optionBasic";
 import { useOptionTextStore } from "@renderer/store/optionText";
 import { useOptionLensStore } from "@renderer/store/optionLens";
 
-import { fontOptions } from "@renderer/default/default-options";
+import { fontOptions } from "@renderer/default/font-options";
 import { loadFont } from "@renderer/utils/tool";
+import { ExifData } from "@renderer/hooks/exifFactory";
 
 import Options from "./components/Options.vue";
 import PreImage from "./components/PreImage.vue";
 import PreList from "./components/PreList.vue";
 import ImageDetail from "@renderer/components/ImageDetail.vue";
-
-import { onMounted } from "vue";
-import { ExifData } from "@renderer/hooks/exifFactory";
+import PopOutput from "@renderer/components/PopOutput.vue";
 
 const store = useFileStore();
 
@@ -84,12 +83,9 @@ const onStart = () => {
 };
 
 // 开始输出
+const outputPopShow = ref<boolean>(false);
 const onOutput = () => {
-	store.startOutput({
-		basic: basicStore._data,
-		text: textStore._data,
-		lens: lensStore._data,
-	});
+	outputPopShow.value = true;
 };
 
 // 复制exif报告数据
@@ -242,6 +238,8 @@ onMounted(async () => {
 			</div>
 		</div>
 		<image-detail v-model:show="showImageInfo" :exif="currentImageExif" :image="currentImage" />
+		<!-- 开始输出弹窗 -->
+		<pop-output v-model:show="outputPopShow"></pop-output>
 	</div>
 </template>
 

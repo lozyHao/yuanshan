@@ -22,6 +22,7 @@ export const useFileStore = defineStore("file", () => {
 	const _currentPreIndex = ref<number>(0); // 当前预览图索引
 
 	const _loading = ref<boolean>(false);
+	const _outputLoading = ref<boolean>(false); // 开始输出
 
 	const fileLength = computed<number>(() => _imageData.value.length);
 
@@ -102,7 +103,12 @@ export const useFileStore = defineStore("file", () => {
 			lens,
 		});
 		//    通过并发量控制
-		const taskQueue = new TaskQueue(3);
+		_outputLoading.value = true
+		const taskQueue = new TaskQueue(3, (_total, _completed, _uncompleted, allCompleted) => {
+			if (allCompleted) {
+				_outputLoading.value = false
+			}
+		});
 
 		// 添加任务
 		for (let i = 1; i <= fileLength.value; i++) {
@@ -130,6 +136,7 @@ export const useFileStore = defineStore("file", () => {
 		_imageData,
 		_currentPreIndex,
 		_loading,
+		_outputLoading,
 		fileLength,
 		addFiles,
 		removeFile,

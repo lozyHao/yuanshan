@@ -127,7 +127,7 @@ const handleChange = async (key: OptionBasicEnum, value: string) => {
 					@update:value="handleChange(OptionBasicEnum.ASPECT_RATIO, $event)" />
 			</n-gi>
 			<n-gi :span="2" class="flex-end"> 输出质量 </n-gi>
-			<n-gi :span="5">
+			<n-gi :span="5" class="flex-start">
 				<n-slider v-model:value="formValue.outputQuality" :step="2" :min="10" :max="100"
 					@update:value="handleChange(OptionBasicEnum.OUTPUT_QUALITY, $event)" />
 			</n-gi>
