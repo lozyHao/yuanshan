@@ -26,6 +26,9 @@ export const useFileStore = defineStore("file", () => {
 
 	const fileLength = computed<number>(() => _imageData.value.length);
 
+	// 任务队列
+	const taskQueue = ref<TaskQueue | null>(null)
+
 	const addFiles = async (files: File[]): Promise<string> => {
 		_loading.value = true;
 		return await new Promise((resolve) => {
@@ -104,7 +107,7 @@ export const useFileStore = defineStore("file", () => {
 		});
 		//    通过并发量控制
 		_outputLoading.value = true
-		const taskQueue = new TaskQueue(3, (_total, _completed, _uncompleted, allCompleted) => {
+		taskQueue.value = new TaskQueue(3, (_total, _completed, _uncompleted, allCompleted) => {
 			if (allCompleted) {
 				_outputLoading.value = false
 			}
@@ -112,13 +115,13 @@ export const useFileStore = defineStore("file", () => {
 
 		// 添加任务
 		for (let i = 1; i <= fileLength.value; i++) {
-			taskQueue.addTask(
+			taskQueue.value.addTask(
 				async () => await _imageData.value[i - 1].onPrint(data, "output"),
 			);
 		}
 
 		// 启动任务队列
-		taskQueue.start();
+		taskQueue.value.start();
 	};
 
 	// 重置清空
@@ -126,6 +129,11 @@ export const useFileStore = defineStore("file", () => {
 		_imageData.value = [];
 		_currentPreIndex.value = 0;
 	};
+
+	// 文件列表恢复默认
+	const restoreDefault = () => {
+		_imageData.value.forEach((item) => item.restoreDefault());
+	}
 
 	// 当前预览图索引
 	const setCurrentPreIndex = (index: number) => {
@@ -145,5 +153,6 @@ export const useFileStore = defineStore("file", () => {
 		startOutput,
 		reset,
 		setCurrentPreIndex,
+		restoreDefault,
 	};
 });

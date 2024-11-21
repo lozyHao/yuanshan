@@ -126,13 +126,9 @@ class ImageData {
 					height ?? img.height,
 					'output',
 					async (message: number | Blob) => {
-						console.log(`${this.filename} 进度：`, message)
 						if (typeof message === 'number') {
 							this.outputPercent = message
 						} else {
-							//   TODO: 发送消息到Electron主线程来保存文件，并接受保存结果
-							//   const img = URL.createObjectURL(message)
-
 							const arrayBuffer = await blobToArrayBuffer(message)
 
 							if (!arrayBuffer) resolve(null)
@@ -144,7 +140,6 @@ class ImageData {
 								dir: params.basic.outputPath,
 								quality: params.basic.outputQuality
 							})
-							console.log('保存结果：', result)
 							if (result) {
 								this.outputStatus = OutputStatusEnum.SUCCESS
 							} else {
@@ -266,6 +261,15 @@ class ImageData {
 		}
 
 		callback(imageDataURL)
+	}
+
+
+	// 恢复默认
+	restoreDefault() {
+		this.preLoading = false
+		this.progress = 0
+		this.outputPercent = 0
+		this.outputStatus = OutputStatusEnum.NO
 	}
 }
 

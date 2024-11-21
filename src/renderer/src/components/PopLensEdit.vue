@@ -188,6 +188,7 @@ watch(
 				<n-gi class="flex-start" :span="3">
 					<font-select v-model:font="formValue.font" :disabled="!formValue.forcedUsed" />
 				</n-gi>
+				<n-gi :span="2"></n-gi>
 				<n-gi class="flex-end" :span="1">强制替换</n-gi>
 				<n-gi class="flex-start" :span="5">
 					<n-switch size="small" class="mx-2" v-model:value="formValue.forcedUsed"></n-switch>

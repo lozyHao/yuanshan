@@ -59,6 +59,11 @@ const onClose = () => {
 	emits('update:show', false)
 }
 
+// 结束：输出结束并且关闭弹窗后，让文件列表状态恢复默认
+const onEnd = () => {
+	store.restoreDefault()
+}
+
 
 // 基础配置设置
 const formValue = computed<OptionBasicValues>(() => {
@@ -71,7 +76,7 @@ const handleChange = async (key: OptionBasicEnum, value: string) => {
 
 <template>
 	<n-modal v-model:show="show" title="处理输出" preset="card" size="huge" :mask-closable="false"
-		:style="{ width: '720px' }" @update:show="onClose">
+		:style="{ width: '720px' }" @update:show="onClose" @after-leave="onEnd">
 		<!-- 输出目录配置 和 输出质量配置 -->
 		<n-grid class="bg-color16 mb-2 p-2 rounded-xl" x-gap="10" y-gap="16" :cols="10">
 			<n-gi :span="1" class="flex-end">输出目录</n-gi>
@@ -97,7 +102,7 @@ const handleChange = async (key: OptionBasicEnum, value: string) => {
 		</n-grid>
 		<!-- 文件列表展示 -->
 		<div
-			class="default-layout max-h-80 w-full mb-4 p-2 overflow-y-auto border-color16 border-1 border-solid rounded-xl">
+			class="default-layout h-80 w-full mb-4 p-2 overflow-y-auto border-color16 border-1 border-solid rounded-xl">
 			<div class="bg-color13 flex-between px-2 py-1 rounded-lg mb-1 overflow-hidden"
 				v-for="(item, index) in fileList" :key="item.key">
 				<div class="color9 pr-2 flex-center font-bold text-xl border-color15 border-r-1 border-r-solid">{{ index
@@ -115,7 +120,6 @@ const handleChange = async (key: OptionBasicEnum, value: string) => {
 		</div>
 
 		<div class="flex-end">
-			<div class="pr-4">处理情况</div>
 			<n-button type="info" @click="onOutput" :disabled="outputLoading">开始输出</n-button>
 		</div>
 	</n-modal>

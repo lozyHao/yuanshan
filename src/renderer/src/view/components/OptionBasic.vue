@@ -32,7 +32,7 @@ const handleChange = async (key: OptionBasicEnum, value: string) => {
 			<n-gi :span="2" class="flex-end">
 				<n-space>
 					<open-dir :icon-size="IconSize.Mini" :dir="formValue.outputPath"> </open-dir>
-					<upload-file :icon-size="IconSize.Mini" :file-type="'directory'"
+					<upload-file :icon-size="IconSize.Mini" :file-type="'directory'" msg="选择文件目录"
 						@on-change="handleChange(OptionBasicEnum.OUTPUT_PATH, $event)">
 					</upload-file>
 				</n-space>
@@ -73,7 +73,7 @@ const handleChange = async (key: OptionBasicEnum, value: string) => {
 					:src="formValue.watermark as string" />
 			</n-gi>
 			<n-gi class="flex flex-wrap justify-end" :span="1">
-				<upload-file :icon-size="IconSize.Mini" :disabled="!formValue.watermarkUsed"
+				<upload-file :icon-size="IconSize.Mini" :disabled="!formValue.watermarkUsed" msg="上传水印图片"
 					@on-change="handleChange(OptionBasicEnum.WATERMARK, $event)"></upload-file>
 				<div class="w-full my-1"></div>
 				<camera-select :disabled="!formValue.watermarkUsed"
@@ -117,14 +117,6 @@ const handleChange = async (key: OptionBasicEnum, value: string) => {
 				<n-slider v-model:value="formValue.bgBlur" :step="10" :min="0" :max="500"
 					@update:value="handleChange(OptionBasicEnum.BG_BLUR, $event)" />
 				<span class="w-12 pl-2">{{ formValue.bgBlur }}</span>
-			</n-gi>
-			<n-gi :span="2" class="flex-end"> 固定宽高比 </n-gi>
-			<n-gi :span="5" class="flex-center">
-				<n-switch v-model:value="formValue.aspectRatioUsed" size="small"
-					@update:value="handleChange(OptionBasicEnum.ASPECT_RATIO_USED, $event)" />
-				<n-select v-model:value="formValue.aspectRatio" class="ml-2" :options="[]"
-					:disabled="!formValue.aspectRatioUsed"
-					@update:value="handleChange(OptionBasicEnum.ASPECT_RATIO, $event)" />
 			</n-gi>
 			<n-gi :span="2" class="flex-end"> 输出质量 </n-gi>
 			<n-gi :span="5" class="flex-start">

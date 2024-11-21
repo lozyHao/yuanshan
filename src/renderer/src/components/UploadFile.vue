@@ -30,6 +30,10 @@ const props = defineProps({
 	disabled: {
 		type: Boolean,
 		default: false
+	},
+	msg: {
+		type: String,
+		default: '上传图片'
 	}
 })
 
@@ -68,7 +72,7 @@ const openFile = async () => {
 					</template>
 				</n-button>
 			</template>
-			<span>点击上传水印图片</span>
+			<span>{{ props.msg }}</span>
 		</n-popover>
 	</div>
 </template>

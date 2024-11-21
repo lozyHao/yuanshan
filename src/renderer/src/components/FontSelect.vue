@@ -33,7 +33,7 @@ watch(
 		<n-popover trigger="hover" :show-arrow="false" :disabled="props.disabled">
 			<template #trigger>
 				<div class="flex-start bg-color16 w-full pl-2 h-8 rounded-md cursor-pointer text-xl"
-					:style="{ fontFamily: selectedFont }">
+					:style="{ fontFamily: selectedFont || 'Arial' }">
 					{{ fontName || '选择字体' }}
 				</div>
 			</template>
