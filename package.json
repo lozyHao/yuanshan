@@ -1,10 +1,9 @@
 {
   "name": "yuanshan",
   "version": "1.0.0",
-  "description": "An Electron application with Vue and TypeScript",
   "main": "./out/main/index.js",
-  "author": "example.com",
-  "homepage": "https://electron-vite.org",
+  "description": "一款快捷方便的照片添加边框/水印的工具平台，能实现自定义样式、文案和图片。",
+  "author": "LozyHao",
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts,.vue --fix",
@@ -25,7 +24,6 @@
     "@electron-toolkit/utils": "^3.0.0",
     "@vueuse/core": "^11.2.0",
     "electron-updater": "^6.1.7",
-    "sharp": "^0.33.5",
     "unplugin-auto-import": "^0.18.3",
     "unplugin-vue-components": "^0.27.4"
   },

@@ -1,5 +1,6 @@
-appId: com.electron.app
+appId: com.lozyhao.yuanshan
 productName: yuanshan
+version: 1.0.0
 directories:
   buildResources: build
 files:

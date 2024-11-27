@@ -81,6 +81,7 @@ class ImageData {
 				width ?? img.width,
 				height ?? img.height,
 				'preview',
+				currentParams.basic.outputQuality,
 				(result: number | Blob) => {
 					console.log(`${this.filename} 进度：`, result)
 					if (typeof result === 'number') {
@@ -125,6 +126,7 @@ class ImageData {
 					width ?? img.width,
 					height ?? img.height,
 					'output',
+					currentParams.basic.outputQuality,
 					async (message: number | Blob) => {
 						if (typeof message === 'number') {
 							this.outputPercent = message
@@ -134,11 +136,8 @@ class ImageData {
 							if (!arrayBuffer) resolve(null)
 							this.outputStatus = OutputStatusEnum.SAVE
 							const result = await (window.api as any).sendSaveFile({
-								width: width ?? img.width,
-								height: height ?? img.height,
 								imageArrayBuffer: arrayBuffer,
 								dir: params.basic.outputPath,
-								quality: params.basic.outputQuality
 							})
 							if (result) {
 								this.outputStatus = OutputStatusEnum.SUCCESS
@@ -162,9 +161,13 @@ class ImageData {
 		width: number,
 		height: number,
 		type: string = 'preview',
+		quality: number = 90,
 		callback: (result: number | Blob) => void
 	) {
 		const { basic, textList } = params
+
+		width = parseFloat((width * quality / 100).toFixed(4))
+		height = parseFloat((height * quality / 100).toFixed(4))
 
 		// 判断是否有内容绘制
 		const haveText =

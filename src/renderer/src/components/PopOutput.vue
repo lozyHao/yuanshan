@@ -48,6 +48,7 @@ const outputLoading = computed(() => store._outputLoading);
 
 // 开始输出
 const onOutput = () => {
+	store.restoreDefault()
 	store.startOutput({
 		basic: basicStore._data,
 		text: textStore._data,

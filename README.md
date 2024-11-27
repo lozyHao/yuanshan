@@ -1,34 +1,66 @@
 # yuanshan
 
-An Electron application with Vue and TypeScript
+> 一款快捷方便的照片添加边框/水印的工具平台，能实现自定义样式、文案和图片。
 
-## Recommended IDE Setup
+## 功能简介
 
-- [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin)
+1. 自定义边框、背景、图片、文字、水印样式。
+2. 自定义效果实时预览、报告生成导出、照片参数拷贝。
+3. 自定义参数和模板。
+4. 图片大小无限制，画质保留无压缩(可执行设置压缩百分比)。
+5. 平台支持暗黑模式、恢复默认状态、文字转图片和画板等工具。
+6. 项目开源任意玩。
 
-## Project Setup
+## 效果图
 
-### Install
+### 主界面
 
-```bash
-$ npm install
-```
+<img src="./static/0-主界面.png" height="300" />
 
-### Development
+### 主界面-暗黑主题
 
-```bash
-$ npm run dev
-```
+<img src="./static/0-主界面-暗黑主题.png" height="300" />
 
-### Build
+### 默认状态
 
-```bash
-# For windows
-$ npm run build:win
+<img src="./static/1-默认.png" height="300" />
 
-# For macOS
-$ npm run build:mac
+### 纯色图片文字背景
 
-# For Linux
-$ npm run build:linux
-```
+<img src="./static/2-纯色图片文字背景.png" height="300" />
+
+### 自定义图片水印+边框
+
+<img src="./static/3-自定义图片水印+边框.png" height="300" />
+
+### 自定义图片水印上传+自定义位置
+
+<img src="./static/4-自定义图片水印上传+自定义位置.png" height="300" />
+
+### 边框在主图内部
+
+<img src="./static/5-边框在主图内部.png" height="300" />
+
+### 自定义边框内容位置
+
+<img src="./static/6-自定义边框内容位置.png" height="300" />
+
+### 自定义图片+文字
+
+<img src="./static/7-自定义图片+文字.png" height="300" />
+
+### 自定义字体样式
+
+<img src="./static/8-自定义字体样式.png" height="300" />
+
+## 期望
+
+1. 版本持续迭代，逐步优化。
+2. 后续将从边框效果、对齐优化、自定义程度（圆角、内容位置、水印、输出比例、边距增益等）、预览效果便捷性等方面进一步提升。
+
+## 结尾
+
+> 软件开发初期，如果有不好的地方，可以在issues中/群聊中 提出您宝贵的意见 （づ￣3￣）づ╭❤～
+> 由于相机设备有限(我只有Nikon Z6_2，目前对其他相机机型了解并不多)，适配度不是很好。如果可以，也可以向我提供一些其他相机拍摄的照片做适配 Thanks♪(･ω･)ﾉ
+
+QQ群：暂定

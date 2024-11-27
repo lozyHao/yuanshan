@@ -3,8 +3,8 @@ import {
 	WeatherSunnyLow20Regular,
 	WeatherMoon24Regular,
 	Settings24Filled,
-	QuestionCircle24Regular,
-	Star24Regular,
+	// QuestionCircle24Regular,
+	// Star24Regular,
 	Toolbox24Filled,
 	DrawText20Filled
 } from '@vicons/fluent'
@@ -156,7 +156,7 @@ const drawingBoardPopShow = ref(false)
 						</div>
 						<span class="color3 pl-2">切换主题</span>
 					</div>
-					<div class="menu-hover flex items-center p-1 rounded-md transition-colors cursor-pointer">
+					<!-- <div class="menu-hover flex items-center p-1 rounded-md transition-colors cursor-pointer">
 						<div class="w-8 h-8 flex items-center justify-center">
 							<n-icon size="24" class="color3">
 								<QuestionCircle24Regular />
@@ -171,7 +171,7 @@ const drawingBoardPopShow = ref(false)
 							</n-icon>
 						</div>
 						<span class="color3 pl-2">支持一下</span>
-					</div>
+					</div> -->
 				</div>
 			</n-popover>
 		</div>

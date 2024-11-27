@@ -183,7 +183,7 @@ class CanvasDraw {
 		console.log('绘制的字体', font)
 		this.ctx.font = `${italic ? 'italic ' : ''} ${bold ? 'bold' : ''} ${size}px ${font}`
 		this.ctx.textAlign = textAlign
-		this.ctx.textBaseline = 'hanging'
+		this.ctx.textBaseline = 'middle'
 		this.ctx.fillText(text, x, y)
 		this.ctx.restore()
 	}
@@ -256,7 +256,7 @@ class CanvasDraw {
 
 		const currentRatio = ratio / 100
 		const currentShadow = (shadow * this.minSize) / 10
-		const currentRadius = radius > 0 ? ((radius / 100) * this.minSize) / 2 : 0
+		const currentRadius = radius > 0 ? ((radius / 100) * this.minSize) : 0
 
 		const bx = (width * (1 - currentRatio)) / 2
 		const by = (height * (1 - currentRatio)) / 2
@@ -272,42 +272,11 @@ class CanvasDraw {
 			this.ctx.shadowOffsetY = 0
 		}
 
-		if (currentRadius) {
-			this.ctx.beginPath()
-			this.ctx.moveTo(bx + currentRadius, by)
-			this.ctx.arcTo(bx + imgWidth, by, bx + imgWidth, by + currentRadius, currentRadius)
-			this.ctx.arcTo(
-				bx + imgWidth,
-				by + imgHeight,
-				bx + imgWidth - currentRadius,
-				by + imgHeight,
-				currentRadius
-			)
-			this.ctx.arcTo(bx, by + imgHeight, bx, by + imgHeight - currentRadius, currentRadius)
-			this.ctx.arcTo(bx, by, bx + currentRadius, by, currentRadius)
-			this.ctx.closePath()
-			this.ctx.fillStyle = '#000000'
-			this.ctx.fill()
-			// 主图圆角裁切
-			this.ctx.beginPath()
-			this.ctx.moveTo(bx + currentRadius, by)
-			this.ctx.arcTo(bx + imgWidth, by, bx + imgWidth, by + currentRadius, currentRadius)
-			this.ctx.arcTo(
-				bx + imgWidth,
-				by + imgHeight,
-				bx + imgWidth - currentRadius,
-				by + imgHeight,
-				currentRadius
-			)
-			this.ctx.arcTo(bx, by + imgHeight, bx, by + imgHeight - currentRadius, currentRadius)
-			this.ctx.arcTo(bx, by, bx + currentRadius, by, currentRadius)
-			this.ctx.closePath()
-			this.ctx.clip()
-		} else {
-			// 直接绘制矩形
-			this.ctx.fillStyle = '#000000'
-			this.ctx.fillRect(bx, by, imgWidth, imgHeight)
-		}
+		// 绘制圆角矩形
+		this.ctx.beginPath()
+		this.ctx.roundRect(bx, by, imgWidth, imgHeight, currentRadius)
+		this.ctx.fill()
+		this.ctx.clip()
 
 		this.ctx.drawImage(image, bx, by, width * currentRatio, height * currentRatio)
 		this.ctx.restore()
@@ -354,7 +323,7 @@ class CanvasDraw {
 				maxHeight = Math.max(maxHeight, h)
 			} else {
 				// 文本
-				const fontSize = borderHeight * item.size
+				const fontSize = borderHeight * item.size * 1.2
 
 				const width = this.measureTextWidth(
 					item.content as string,
@@ -406,7 +375,7 @@ class CanvasDraw {
 				}
 			} else {
 				// 文本
-				const fontSize = borderHeight * item.size
+				const fontSize = borderHeight * item.size * 1.2
 				const textWidth = this.measureTextWidth(
 					item.content as string,
 					fontSize,
@@ -418,7 +387,7 @@ class CanvasDraw {
 				this.drawText({
 					text: item.content as string,
 					x: currentX,
-					y: yPosition - fontSize / 2,
+					y: yPosition,
 					font: item.font,
 					color: item.color || '#000000',
 					size: fontSize,

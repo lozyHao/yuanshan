@@ -132,6 +132,7 @@ export const useFileStore = defineStore("file", () => {
 
 	// 文件列表恢复默认
 	const restoreDefault = () => {
+		if (_outputLoading.value) return
 		_imageData.value.forEach((item) => item.restoreDefault());
 	}
 

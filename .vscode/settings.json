@@ -9,9 +9,12 @@
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
 	"cSpell.words": [
+		"asar",
 		"hasselblad",
 		"leica",
+		"nsis",
 		"songdian",
-		"xmage"
+		"xmage",
+		"yuanshan"
 	]
 }

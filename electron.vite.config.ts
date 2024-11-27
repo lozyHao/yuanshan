@@ -7,46 +7,44 @@ import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
 import UnoCSS from 'unocss/vite'
 
 export default defineConfig({
-  main: {
-    plugins: [externalizeDepsPlugin()]
-  },
-  preload: {
-    plugins: [externalizeDepsPlugin()]
-  },
-  renderer: {
-    plugins: [
-      vue(),
-      UnoCSS(),
-      AutoImport({
-        imports: [
-          'vue',
-          {
-            'naive-ui': ['useDialog', 'useMessage', 'useNotification', 'useLoadingBar']
-          }
-        ]
-      }),
-      Components({
-        resolvers: [NaiveUiResolver()]
-      })
-    ],
-    css: {
-      preprocessorOptions: {
-        less: {
-          additionalData: '@import "@renderer/assets/styles/theme.less";',
-          javascriptEnabled: true
-        }
-      }
-    },
-    resolve: {
-      alias: {
-        '@renderer': resolve('src/renderer/src')
-      }
-    },
-    server: {
-      port: 7777
-    },
-    worker: {
-      format: 'es'
-    }
-  }
+	main: {
+		plugins: [externalizeDepsPlugin()]
+	},
+	preload: {
+		plugins: [externalizeDepsPlugin()]
+	},
+	renderer: {
+		base: './',
+		plugins: [
+			vue(),
+			UnoCSS(),
+			AutoImport({
+				imports: [
+					'vue',
+					{
+						'naive-ui': ['useDialog', 'useMessage', 'useNotification', 'useLoadingBar']
+					}
+				]
+			}),
+			Components({
+				resolvers: [NaiveUiResolver()]
+			})
+		],
+		css: {
+			preprocessorOptions: {
+				less: {
+					additionalData: '@import "@renderer/assets/styles/theme.less";',
+					javascriptEnabled: true
+				}
+			}
+		},
+		resolve: {
+			alias: {
+				'@renderer': resolve('src/renderer/src')
+			}
+		},
+		worker: {
+			format: 'es'
+		}
+	}
 })
