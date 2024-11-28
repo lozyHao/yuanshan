@@ -26,7 +26,7 @@ const handleChange = async (key: OptionBasicEnum, value: string) => {
 			<n-gi :span="2" class="flex-end">输出目录</n-gi>
 			<n-gi :span="3">
 				<n-ellipsis>
-					<span class="text-xs">{{ formValue.outputPath }}</span>
+					<span class="text-xs">{{ formValue.outputPath || '无' }}</span>
 				</n-ellipsis>
 			</n-gi>
 			<n-gi :span="2" class="flex-end">

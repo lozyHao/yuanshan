@@ -69,9 +69,8 @@ const handleFileOpenDirectory = async () => {
 }
 
 // 打开文件夹，根据定位路径打开文件管理
-const handleFileOpenDirectoryByPath = async (event, filePath) => {
-	console.log(event, filePath)
-	shell.showItemInFolder(filePath)
+const handleFileOpenDirectoryByPath = async (_event, filePath: string) => {
+	shell.openPath(filePath)
 }
 
 // 保存文件

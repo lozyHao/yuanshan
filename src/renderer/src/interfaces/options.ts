@@ -22,7 +22,7 @@ export enum OptionBasicEnum {
 }
 
 export interface OptionBasicValues {
-	[OptionBasicEnum.OUTPUT_PATH]: string
+	[OptionBasicEnum.OUTPUT_PATH]: string | null
 	[OptionBasicEnum.PATTERN]: OptionPatternEnum
 	[OptionBasicEnum.MAIN_IMG_SIZE]: number
 	[OptionBasicEnum.TEXT_BG_COLOR]: string

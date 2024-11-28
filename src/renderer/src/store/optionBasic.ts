@@ -9,13 +9,12 @@ import {
 	WatermarkPositionEnum,
 	OptionPatternEnum
 } from '@renderer/interfaces/options'
-import { defaultOptions } from '@renderer/default/default-options'
 
 export const useOptionBasicStore = defineStore(
 	'optionBasic',
 	() => {
 		const _data = ref<OptionBasicValues>({
-			[OptionBasicEnum.OUTPUT_PATH]: defaultOptions.defaultDir, // 输出目录
+			[OptionBasicEnum.OUTPUT_PATH]: null, // 输出目录
 			[OptionBasicEnum.PATTERN]: OptionPatternEnum.OUT, // 模式
 			[OptionBasicEnum.MAIN_IMG_SIZE]: 90, // 主图尺寸
 			[OptionBasicEnum.TEXT_BG_COLOR]: '#000000', // 文字背景
@@ -53,7 +52,7 @@ export const useOptionBasicStore = defineStore(
 		// 恢复默认
 		const reset = () => {
 			_data.value = {
-				[OptionBasicEnum.OUTPUT_PATH]: defaultOptions.defaultDir, // 输出目录
+				[OptionBasicEnum.OUTPUT_PATH]: null, // 输出目录
 				[OptionBasicEnum.PATTERN]: OptionPatternEnum.OUT, // 模式
 				[OptionBasicEnum.MAIN_IMG_SIZE]: 90, // 主图尺寸
 				[OptionBasicEnum.TEXT_BG_COLOR]: '#000000', // 文字背景

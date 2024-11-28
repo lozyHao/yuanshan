@@ -55,6 +55,7 @@ const openFile = async () => {
 
 	if (props.fileType === 'directory') {
 		const filePath = await (window.api as any).openFileDirectory()
+		if (!filePath) return
 		emits('onChange', filePath[0])
 		return
 	}
