@@ -14,7 +14,6 @@ export default defineConfig({
 		plugins: [externalizeDepsPlugin()]
 	},
 	renderer: {
-		base: './',
 		plugins: [
 			vue(),
 			UnoCSS(),
@@ -45,6 +44,9 @@ export default defineConfig({
 		},
 		worker: {
 			format: 'es'
+		},
+		server: {
+			port: 7777
 		}
 	}
 })

@@ -3,6 +3,7 @@ import path from 'path'
 import fs from 'fs'
 
 const start = () => {
+	console.log('eventHandler')
 	ipcMain.handle('dialog:openFile', handleFileOpen)
 	ipcMain.handle('dialog:openFileMulti', handleFileOpenMulti)
 	ipcMain.handle('dialog:openFileDirectory', handleFileOpenDirectory)

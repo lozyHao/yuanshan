@@ -1,6 +1,6 @@
 appId: com.lozyhao.yuanshan
 productName: yuanshan
-version: 1.0.0
+copyright: Copyright © 2024 LozyHao·yuanshan
 directories:
   buildResources: build
 files:

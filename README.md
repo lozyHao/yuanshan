@@ -23,11 +23,11 @@
 
 ### 默认状态
 
-<img src="./static/1-默认.png" height="300" />
+<img src="./static/1-默认.png" width="300" />
 
 ### 纯色图片文字背景
 
-<img src="./static/2-纯色图片文字背景.png" height="300" />
+<img src="./static/2-纯色图片文字背景.png" width="300" />
 
 ### 自定义图片水印+边框
 
@@ -52,6 +52,10 @@
 ### 自定义字体样式
 
 <img src="./static/8-自定义字体样式.png" height="300" />
+
+### 报告生成导出
+
+<img src="./static/9-报告生成导出.png" width="300" />
 
 ## 期望
 
