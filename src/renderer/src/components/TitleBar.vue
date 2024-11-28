@@ -71,7 +71,7 @@ const checkDevice = () => {
 	console.log(navigator)
 	const platform = navigator.userAgent.toLowerCase();
 	if (platform.includes('win')) {
-		isDevice.value = 'mac'
+		isDevice.value = 'win'
 		return
 	} else if (platform.includes('mac')) {
 		isDevice.value = 'mac'
@@ -87,7 +87,7 @@ onMounted(() => {
 </script>
 <template>
 	<div class="title-bar flex-between w-full h-full"
-		:class="{ 'pr-36': isDevice === 'win' || isDevice === 'other', 'pl-20': isDevice === 'mac' || isDevice === 'other' }">
+		:class="{ 'pr-32': isDevice === 'win' || isDevice === 'other', 'pl-16': isDevice === 'mac' || isDevice === 'other' }">
 		<div class="flex-center" :class="{}">
 			<img class="h-8" src="@renderer/assets/images/logo.png" />
 			<span class="color-013D3A font-bold text-base ml-2">远 山</span>

@@ -37,7 +37,7 @@ const darkThemeOverrides = {
 			<n-dialog-provider>
 				<n-message-provider>
 					<div id="app-content" class="bg-color15">
-						<div class="drag-box border-color16 border-b-1 border-b-solid w-full h-10 bg-color14">
+						<div class="drag-box border-color16 border-b-1 border-b-solid w-full h-10 bg-color14 px-4">
 							<title-bar></title-bar>
 						</div>
 						<div class="content-box">
