@@ -56,7 +56,6 @@ export const defaultOptions = {
 	fontBold: false,
 	fontItalic: false,
 	fontFamily: fontOptions[0].value,
-	defaultDir: 'C:\\Program Files\\yuanshan'
 }
 
 // 默认相机参数

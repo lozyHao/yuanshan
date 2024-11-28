@@ -85,6 +85,10 @@ const onStart = () => {
 // 开始输出
 const outputPopShow = ref<boolean>(false);
 const onOutput = () => {
+	if (!basicStore._data.outputPath) {
+		message.warning("请先设置输出路径");
+		return
+	}
 	outputPopShow.value = true;
 };
 
