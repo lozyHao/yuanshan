@@ -7,7 +7,7 @@ import {
 	OptionBasicValues,
 	OptionBasicEnum,
 	WatermarkPositionEnum,
-	OptionPatternEnum
+	OutputFormatEnum
 } from '@renderer/interfaces/options'
 
 export const useOptionBasicStore = defineStore(
@@ -15,15 +15,16 @@ export const useOptionBasicStore = defineStore(
 	() => {
 		const _data = ref<OptionBasicValues>({
 			[OptionBasicEnum.OUTPUT_PATH]: null, // 输出目录
-			[OptionBasicEnum.PATTERN]: OptionPatternEnum.OUT, // 模式
-			[OptionBasicEnum.MAIN_IMG_SIZE]: 90, // 主图尺寸
+			[OptionBasicEnum.OUTPUT_FORMAT]: OutputFormatEnum.JPG, // 输出格式
 			[OptionBasicEnum.TEXT_BG_COLOR]: '#000000', // 文字背景
 			[OptionBasicEnum.TEXT_BG_COLOR_USED]: false, // 文字背景是否启用
 			[OptionBasicEnum.WATERMARK]: null, //   水印
 			[OptionBasicEnum.WATERMARK_POSITION]: WatermarkPositionEnum.BOTTOM, // 水印位置
 			[OptionBasicEnum.WATERMARK_USED]: false, // 水印是否启用
 			[OptionBasicEnum.WATERMARK_SIZE]: 0.3, // 水印尺寸
-			[OptionBasicEnum.ROUNDED_SIZE]: 5, // 圆角
+			[OptionBasicEnum.ROUNDED_SIZE]: [5, 5, 5, 5], // 圆角 ([左上, 右上, 右下, 左下])
+			[OptionBasicEnum.BORDER_WIDTH]: [5, 5, 5, 5], // 边框 ([上, 右, 下, 左])
+			[OptionBasicEnum.BORDER_SIZE]: 8, // 主边框
 			[OptionBasicEnum.SHADOW_SIZE]: 0.6, // 阴影大小
 			[OptionBasicEnum.BG_COLOR]: '#000000', // 背景颜色纯色
 			[OptionBasicEnum.BG_COLOR_USED]: false, // 背景颜色是否启用
@@ -53,15 +54,16 @@ export const useOptionBasicStore = defineStore(
 		const reset = () => {
 			_data.value = {
 				[OptionBasicEnum.OUTPUT_PATH]: null, // 输出目录
-				[OptionBasicEnum.PATTERN]: OptionPatternEnum.OUT, // 模式
-				[OptionBasicEnum.MAIN_IMG_SIZE]: 90, // 主图尺寸
+				[OptionBasicEnum.OUTPUT_FORMAT]: OutputFormatEnum.JPG, // 输出格式
 				[OptionBasicEnum.TEXT_BG_COLOR]: '#000000', // 文字背景
 				[OptionBasicEnum.TEXT_BG_COLOR_USED]: false, // 文字背景是否启用
 				[OptionBasicEnum.WATERMARK]: null, //   水印
 				[OptionBasicEnum.WATERMARK_POSITION]: WatermarkPositionEnum.BOTTOM, // 水印位置
 				[OptionBasicEnum.WATERMARK_USED]: false, // 水印是否启用
 				[OptionBasicEnum.WATERMARK_SIZE]: 0.3, // 水印尺寸
-				[OptionBasicEnum.ROUNDED_SIZE]: 5, // 圆角
+				[OptionBasicEnum.ROUNDED_SIZE]: [5, 5, 5, 5], // 圆角
+				[OptionBasicEnum.BORDER_WIDTH]: [5, 5, 5, 5], // 边框
+				[OptionBasicEnum.BORDER_SIZE]: 8, // 主边框
 				[OptionBasicEnum.SHADOW_SIZE]: 0.6, // 阴影大小
 				[OptionBasicEnum.BG_COLOR]: '#000000', // 背景颜色纯色
 				[OptionBasicEnum.BG_COLOR_USED]: false, // 背景颜色是否启用

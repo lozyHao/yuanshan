@@ -43,13 +43,16 @@ declare module 'vue' {
     NTabs: typeof import('naive-ui')['NTabs']
     NTag: typeof import('naive-ui')['NTag']
     NText: typeof import('naive-ui')['NText']
+    NumberInput: typeof import('./src/components/NumberInput.vue')['default']
     OpenDir: typeof import('./src/components/openDir.vue')['default']
     PopCanvasSign: typeof import('./src/components/PopCanvasSign.vue')['default']
     PopDrawingBoard: typeof import('./src/components/PopDrawingBoard.vue')['default']
     PopLensEdit: typeof import('./src/components/PopLensEdit.vue')['default']
     PopOutput: typeof import('./src/components/PopOutput.vue')['default']
     PopTextTemplateEdit: typeof import('./src/components/PopTextTemplateEdit.vue')['default']
+    Slider: typeof import('./src/components/Slider.vue')['default']
     TitleBar: typeof import('./src/components/TitleBar.vue')['default']
     UploadFile: typeof import('./src/components/UploadFile.vue')['default']
+    YSlider: typeof import('./src/components/YSlider.vue')['default']
   }
 }

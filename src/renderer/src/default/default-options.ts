@@ -1,7 +1,3 @@
-/** 默认的配置项 */
-import modal01 from '@renderer/assets/images/modal01.png'
-import modal02 from '@renderer/assets/images/modal02.png'
-
 // 导入所有相机品牌
 import xmage from '@renderer/assets/mark_logo/xmage.png'
 import xmage_w from '@renderer/assets/mark_logo/xmage-w.png'
@@ -43,8 +39,8 @@ import sigma_b from '@renderer/assets/mark_logo/sigma-b.png'
 import {
 	OptionLensValues,
 	OptionTextTemplateValues,
+	OutputFormatEnum,
 	TextTemplatePositionEnum,
-	OptionPatternEnum,
 	WatermarkPositionEnum
 } from '@renderer/interfaces/options'
 import { fontOptions } from './font-options'
@@ -149,14 +145,17 @@ export const defTextTemps: OptionTextTemplateValues[] = [
 ]
 
 // 模式
-export const modalOptions = [
+export const outputFormatOptions = [
 	{
-		key: OptionPatternEnum.OUT,
-		img: modal01
+		label: OutputFormatEnum.PNG,
+		value: 'image/png'
 	},
 	{
-		key: OptionPatternEnum.IN,
-		img: modal02
+		label: OutputFormatEnum.JPG,
+		value: 'image/jpeg'
+	}, {
+		label: OutputFormatEnum.WEBP,
+		value: 'image/webp'
 	}
 ]
 

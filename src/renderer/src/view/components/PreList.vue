@@ -26,7 +26,7 @@ const handleFileChange = async (e: Event) => {
 	const t = e.target as HTMLInputElement
 	const isRepetition = await store.addFiles(Array.from(t.files as FileList))
 	if (isRepetition) {
-		message.warning(isRepetition)
+		message.success(isRepetition)
 	}
 	// 选择结束
 	t.value = ''

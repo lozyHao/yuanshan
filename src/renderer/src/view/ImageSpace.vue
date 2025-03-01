@@ -16,6 +16,7 @@ import { useOptionBasicStore } from "@renderer/store/optionBasic";
 import { useOptionTextStore } from "@renderer/store/optionText";
 import { useOptionLensStore } from "@renderer/store/optionLens";
 
+import { TextTemplatePositionEnum } from "@renderer/interfaces/options"
 import { fontOptions } from "@renderer/default/font-options";
 import { loadFont } from "@renderer/utils/tool";
 import { ExifData } from "@renderer/hooks/exifFactory";
@@ -48,12 +49,24 @@ const progress = computed(() => {
 	return fileList.value[index.value]?.progress || 0;
 });
 
+
+// 文本的位置中心配置项
+const headerTextPosition = computed<[number, number, number]>(() => {
+	return textStore.getTextPosition(TextTemplatePositionEnum.HEADER)
+})
+const middleTextPosition = computed<[number, number, number]>(() => {
+	return textStore.getTextPosition(TextTemplatePositionEnum.MIDDLE)
+})
+const footerTextPosition = computed<[number, number, number]>(() => {
+	return textStore.getTextPosition(TextTemplatePositionEnum.FOOTER)
+})
+
 // 选择文件
 const handleFileChange = async (e: Event) => {
 	const t = e.target as HTMLInputElement;
 	const isRepetition = await store.addFiles(Array.from(t.files as FileList));
 	if (isRepetition) {
-		message.warning(isRepetition);
+		message.success(isRepetition);
 	}
 	// 选择结束
 	t.value = "";
@@ -79,6 +92,7 @@ const onStart = () => {
 		basic: basicStore._data,
 		text: textStore._data,
 		lens: lensStore._data,
+		textPosition: { headerTextPosition: headerTextPosition.value, middleTextPosition: middleTextPosition.value, footerTextPosition: footerTextPosition.value }
 	});
 };
 

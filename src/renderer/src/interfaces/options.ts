@@ -4,8 +4,7 @@
 // 基础配置
 export enum OptionBasicEnum {
 	OUTPUT_PATH = 'outputPath', // 输出目录
-	PATTERN = 'pattern', // 模式
-	MAIN_IMG_SIZE = 'mainImgSize', // 主图尺寸
+	OUTPUT_FORMAT = 'outputFormat', // 输出格式
 	TEXT_BG_COLOR = 'textBgColor', // 文字背景
 	TEXT_BG_COLOR_USED = 'textBgColorUsed', // 文字背景是否启用
 	WATERMARK = 'watermark', // 图片水印
@@ -13,6 +12,8 @@ export enum OptionBasicEnum {
 	WATERMARK_USED = 'watermarkUsed', // 水印是否启用
 	WATERMARK_SIZE = 'watermarkSize', // 水印尺寸
 	ROUNDED_SIZE = 'roundedSize', // 圆角
+	BORDER_WIDTH = 'borderWidth', // 副边框
+	BORDER_SIZE = 'borderSize', // 主边框-文字边框
 	SHADOW_SIZE = 'shadowSize', // 阴影大小
 	BG_COLOR = 'bgColor', // 背景颜色纯色
 	BG_COLOR_USED = 'bgColorUsed', // 背景颜色是否启用
@@ -23,15 +24,16 @@ export enum OptionBasicEnum {
 
 export interface OptionBasicValues {
 	[OptionBasicEnum.OUTPUT_PATH]: string | null
-	[OptionBasicEnum.PATTERN]: OptionPatternEnum
-	[OptionBasicEnum.MAIN_IMG_SIZE]: number
+	[OptionBasicEnum.OUTPUT_FORMAT]: string
 	[OptionBasicEnum.TEXT_BG_COLOR]: string
 	[OptionBasicEnum.TEXT_BG_COLOR_USED]: boolean
 	[OptionBasicEnum.WATERMARK]?: ImageBitmap | string | null
 	[OptionBasicEnum.WATERMARK_POSITION]?: WatermarkPositionEnum
 	[OptionBasicEnum.WATERMARK_USED]?: boolean
 	[OptionBasicEnum.WATERMARK_SIZE]?: number
-	[OptionBasicEnum.ROUNDED_SIZE]: number
+	[OptionBasicEnum.ROUNDED_SIZE]: [number, number, number, number]
+	[OptionBasicEnum.BORDER_WIDTH]: [number, number, number, number]
+	[OptionBasicEnum.BORDER_SIZE]: number
 	[OptionBasicEnum.SHADOW_SIZE]: number
 	[OptionBasicEnum.BG_COLOR]?: string
 	[OptionBasicEnum.BG_COLOR_USED]?: boolean
@@ -67,11 +69,20 @@ export interface OptionTextTemplateValues {
 	[OptionTextTemplateEnum.position]: TextTemplatePositionEnum
 }
 
+// 文本的中线对齐配置
+export interface TextPositionValues {
+	headerTextPosition: [number, number, number];
+	middleTextPosition: [number, number, number];
+	footerTextPosition: [number, number, number];
+}
+
 // 相机参数
 export enum OptionLensEnum {
 	KEY = 'key', // 标识
 	TYPE = 'type', // 类型 0-系统 1-自定义
 	NAME = 'name', // 名称
+	PREFIX = 'prefix', // 前缀
+	SUFFIX = 'suffix', // 后缀
 	CONTENT_TYPE = 'contentType', // 内容类型 0-文本 1-图片
 	CONTENT_TEXT = 'contentText', // 文本
 	CONTENT_IMAGE = 'contentImage', // 图片
@@ -88,6 +99,8 @@ export enum OptionLensEnum {
 
 export interface OptionLensValues {
 	[OptionLensEnum.KEY]: string | null
+	[OptionLensEnum.PREFIX]?: string | null
+	[OptionLensEnum.SUFFIX]?: string | null
 	[OptionLensEnum.TYPE]: number
 	[OptionLensEnum.NAME]: string | null
 	[OptionLensEnum.CONTENT_TYPE]?: number
@@ -107,10 +120,11 @@ export interface OptionLensValues {
 /**
  * 其他
  */
-// 模式
-export enum OptionPatternEnum {
-	OUT = 'out',
-	IN = 'in'
+// 输出格式
+export enum OutputFormatEnum {
+	PNG = 'png',
+	JPG = 'jpg',
+	WEBP = 'webp'
 }
 
 // 水印位置

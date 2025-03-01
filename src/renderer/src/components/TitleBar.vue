@@ -51,6 +51,7 @@ const onClear = () => {
 				break
 			case 'text':
 				textStore.reset()
+				textStore.resetTextPosition()
 				break
 			case 'lens':
 				lensStore.reset()

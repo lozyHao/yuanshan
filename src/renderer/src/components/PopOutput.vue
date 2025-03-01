@@ -1,14 +1,18 @@
 <script setup lang="ts">
 import ImageData from '@renderer/hooks/imageData';
 import { IconSize, OptionBasicEnum, OptionBasicValues } from '@renderer/interfaces/options';
+
+import { computed } from 'vue';
 import { useFileStore } from '@renderer/store/file';
 import { useOptionBasicStore } from '@renderer/store/optionBasic';
 import { useOptionLensStore } from '@renderer/store/optionLens';
 import { useOptionTextStore } from '@renderer/store/optionText';
-import { computed } from 'vue';
+
+import { TextTemplatePositionEnum } from "@renderer/interfaces/options"
 
 import UploadFile from '@renderer/components/UploadFile.vue'
 import OpenDir from '@renderer/components/openDir.vue'
+import { outputFormatOptions } from '@renderer/default/default-options';
 
 const outputStatus = {
 	no: '等待中',
@@ -46,6 +50,18 @@ const lensStore = useOptionLensStore();
 const fileList = computed<ImageData[]>(() => store._imageData);
 const outputLoading = computed(() => store._outputLoading);
 
+
+// 文本的位置中心配置项
+const headerTextPosition = computed<[number, number, number]>(() => {
+	return textStore.getTextPosition(TextTemplatePositionEnum.HEADER)
+})
+const middleTextPosition = computed<[number, number, number]>(() => {
+	return textStore.getTextPosition(TextTemplatePositionEnum.MIDDLE)
+})
+const footerTextPosition = computed<[number, number, number]>(() => {
+	return textStore.getTextPosition(TextTemplatePositionEnum.FOOTER)
+})
+
 // 开始输出
 const onOutput = () => {
 	store.restoreDefault()
@@ -53,6 +69,7 @@ const onOutput = () => {
 		basic: basicStore._data,
 		text: textStore._data,
 		lens: lensStore._data,
+		textPosition: { headerTextPosition: headerTextPosition.value, middleTextPosition: middleTextPosition.value, footerTextPosition: footerTextPosition.value }
 	});
 };
 
@@ -81,7 +98,7 @@ const handleChange = async (key: OptionBasicEnum, value: string) => {
 		<!-- 输出目录配置 和 输出质量配置 -->
 		<n-grid class="bg-color16 mb-2 p-2 rounded-xl" x-gap="10" y-gap="16" :cols="10">
 			<n-gi :span="1" class="flex-end">输出目录</n-gi>
-			<n-gi :span="3">
+			<n-gi :span="8">
 				<n-ellipsis>
 					<span class="text-xs">{{ formValue.outputPath }}</span>
 				</n-ellipsis>
@@ -100,6 +117,11 @@ const handleChange = async (key: OptionBasicEnum, value: string) => {
 				<n-slider v-model:value="formValue.outputQuality" :step="2" :min="10" :max="100"
 					:disabled="outputLoading" @update:value="handleChange(OptionBasicEnum.OUTPUT_QUALITY, $event)" />
 			</n-gi>
+			<n-gi :span="1" class="flex-end"> 输出格式 </n-gi>
+			<n-gi :span="4" class="flex-start">
+				<n-select v-model:value="formValue.outputFormat" :options="outputFormatOptions"
+					:disabled="outputLoading" @update:value="handleChange(OptionBasicEnum.OUTPUT_FORMAT, $event)" />
+			</n-gi>
 		</n-grid>
 		<!-- 文件列表展示 -->
 		<div
@@ -108,7 +130,7 @@ const handleChange = async (key: OptionBasicEnum, value: string) => {
 				v-for="(item, index) in fileList" :key="item.key">
 				<div class="color9 pr-2 flex-center font-bold text-xl border-color15 border-r-1 border-r-solid">{{ index
 					+ 1
-					}}</div>
+				}}</div>
 				<div class="flex-1 pl-3">
 					<div class="font-bold">{{ item.filename }}</div>
 					<n-progress class="mt-1" style="width: calc(100% - 48px);" type="line"
