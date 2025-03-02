@@ -76,12 +76,10 @@ const handleFileOpenDirectoryByPath = async (_event, filePath: string) => {
 // 保存文件
 const handleSaveFiles = async (params: {
 	imageArrayBuffer: ArrayBuffer
-	width: number
-	height: number
-	dir: string
-	quality: number
+	dir: string,
+	outputFormat: string
 }) => {
-	const { imageArrayBuffer, dir } = params
+	const { imageArrayBuffer, dir, outputFormat = "image/jpeg" } = params
 
 	//   确保临时目录存在
 	if (!fs.existsSync(dir)) {
@@ -90,7 +88,7 @@ const handleSaveFiles = async (params: {
 
 	// eslint-disable-next-line no-async-promise-executor
 	return await new Promise(async (resolve) => {
-		const fileName = Date.now() + '.png'
+		const fileName = Date.now() + '.' + outputFormat.split('/')[1]
 		try {
 			await fs.promises.writeFile(dir + '/' + fileName, Buffer.from(imageArrayBuffer), 'binary')
 			resolve(true)

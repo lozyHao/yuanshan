@@ -84,12 +84,12 @@ class ImageData {
 				'preview',
 				currentParams.basic.outputQuality,
 				params.textPosition,
-				(result: number | Blob) => {
+				(result: number | { url: Blob, outputFormat: string }) => {
 					console.log(`${this.filename} 进度：`, result)
 					if (typeof result === 'number') {
 						this.progress = result
 					} else {
-						this.outerUrl = URL.createObjectURL(result)
+						this.outerUrl = URL.createObjectURL(result.url)
 						this.preLoading = false
 					}
 				}
@@ -131,17 +131,18 @@ class ImageData {
 					'output',
 					currentParams.basic.outputQuality,
 					params.textPosition,
-					async (message: number | Blob) => {
+					async (message: number | { url: Blob, outputFormat: string }) => {
 						if (typeof message === 'number') {
 							this.outputPercent = message
 						} else {
-							const arrayBuffer = await blobToArrayBuffer(message)
+							const arrayBuffer = await blobToArrayBuffer(message.url)
 
 							if (!arrayBuffer) resolve(null)
 							this.outputStatus = OutputStatusEnum.SAVE
 							const result = await (window.api as any).sendSaveFile({
 								imageArrayBuffer: arrayBuffer,
 								dir: params.basic.outputPath,
+								outputFormat: message.outputFormat
 							})
 							if (result) {
 								this.outputStatus = OutputStatusEnum.SUCCESS
@@ -167,7 +168,7 @@ class ImageData {
 		type: string = 'preview',
 		quality: number = 90,
 		textPosition: TextPositionValues,
-		callback: (result: number | Blob) => void
+		callback: (result: number | { url: Blob, outputFormat: string }) => void
 	) {
 		const { basic, textList } = params
 
@@ -271,7 +272,7 @@ class ImageData {
 			callback(95)
 		}
 
-		callback(imageDataURL)
+		callback({ url: imageDataURL, outputFormat: basic.outputFormat })
 	}
 
 
