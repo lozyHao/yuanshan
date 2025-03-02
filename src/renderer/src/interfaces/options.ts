@@ -122,9 +122,9 @@ export interface OptionLensValues {
  */
 // 输出格式
 export enum OutputFormatEnum {
-	PNG = 'png',
-	JPG = 'jpg',
-	WEBP = 'webp'
+	PNG = 'image/png',
+	JPG = 'image/jpeg',
+	WEBP = 'image/webp'
 }
 
 // 水印位置
