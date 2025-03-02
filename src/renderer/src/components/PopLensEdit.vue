@@ -33,6 +33,8 @@ const formValue = ref<OptionLensValues>({
 	key: null,
 	type: 1,
 	name: null,
+	prefix: null,
+	suffix: null,
 	contentType: 0,
 	contentText: null,
 	contentImage: null,
@@ -90,6 +92,8 @@ watch(
 				key: null,
 				type: 1,
 				name: null,
+				prefix: null,
+				suffix: null,
 				contentType: 0,
 				contentText: null,
 				contentImage: null,
@@ -112,6 +116,8 @@ watch(
 			formValue.value.key = props.pre.key
 			formValue.value.type = props.pre.type
 			formValue.value.name = props.pre.name
+			formValue.value.prefix = props.pre.prefix
+			formValue.value.suffix = props.pre.suffix
 			formValue.value.contentType = props.pre.contentType || 0
 			formValue.value.contentText = props.pre.contentText || null
 			formValue.value.contentImage = props.pre.contentImage || null
@@ -138,6 +144,18 @@ watch(
 				</n-gi>
 				<n-gi :span="5">
 					<n-input v-model:value="formValue.name" :disabled="formValue.type === 0"></n-input>
+				</n-gi>
+				<n-gi class="flex-end" :span="1">
+					<must-text label="前缀"></must-text>
+				</n-gi>
+				<n-gi :span="2">
+					<n-input v-model:value="formValue.prefix"></n-input>
+				</n-gi>
+				<n-gi class="flex-end" :span="1">
+					<must-text label="后缀"></must-text>
+				</n-gi>
+				<n-gi :span="2">
+					<n-input v-model:value="formValue.suffix"></n-input>
 				</n-gi>
 				<n-gi class="flex-end" :span="1">
 					<must-text label="内容"></must-text>

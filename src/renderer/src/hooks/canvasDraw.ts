@@ -1,7 +1,6 @@
 import { WatermarkPositionEnum } from '@renderer/interfaces/options'
 
 type Position = 'center' | 'left' | 'right'
-type Mode = 'in' | 'out' // 模式（边框所在位置，内侧还是外侧）
 
 type ImageBitmap = {
 	height: number
@@ -65,7 +64,7 @@ type DrawMainImageType = {
 	width?: number
 	height?: number
 	ratio?: number // 图占比 50-100
-	radius?: number // 圆角 0-50
+	radius?: [number, number, number, number] // 圆角 0-50
 	shadow?: number // 阴影 0.1-1
 }
 
@@ -93,6 +92,7 @@ type ImageTextType = {
 	items: ImageTextItem[]
 	x: Position
 	y: number // 0 仅仅一个 1 两个-第一个 2 两个-第二个
+	positionOptions: [number, number, number] // 文本对齐中线位置
 }
 
 /** canvas 绘制相关 */
@@ -103,38 +103,34 @@ class CanvasDraw {
 	height: number = 1600 // 高度
 	minSize: number = 1200 // 宽和高中，最小尺寸，用于计算 文字和图片的大小
 
-	borderRatio: number = 0.12 // 边框角度
-	mode: Mode = 'out' // 模式（边框所在位置）
 	border: boolean = false // 是否有边框绘制了纯色
 	ratio: number = 90 // 图占比
+	borderWidth: [number, number, number, number] = [5, 5, 5, 5] // 副边框
+	borderSize: number = 10 // 主边框
 	haveText: boolean = true // 是否有文字绘制
 
 	constructor(
 		width: number,
 		height: number,
-		mode: Mode = 'out',
 		border: boolean = false,
-		ratio: number = 90,
+		borderWidth: [number, number, number, number] = [5, 5, 5, 5],
+		borderSize: number = 10,
 		haveText: boolean = true
 	) {
 		this.minSize = Math.min(width, height)
-		this.width = width
-		this.mode = mode
 		this.border = border
-		this.ratio = ratio
+		this.borderWidth = borderWidth
+		this.borderSize = borderSize
 		this.haveText = haveText
 
+		console.log("边框：", borderWidth, borderSize, "图片：", width, height)
+		this.width = width + this.minSize * ((borderWidth[1] + borderWidth[3]) / 100)
+		this.height = height + this.minSize * ((borderWidth[0] + borderWidth[2]) / 100)
 		if (haveText) {
-			const b = mode === 'in' ? 0 : this.minSize * this.borderRatio
-			const c = mode === 'in' ? 0 : (((1 - ratio / 100) / 2) * this.minSize) / 2
-			if (border) {
-				this.height = height + b
-			} else {
-				this.height = height + b - c
-			}
-		} else {
-			this.height = height
+			this.height += this.minSize * (borderSize / 100)
 		}
+
+		console.log("输出大小：", this.width, this.height)
 
 		this.canvas = new OffscreenCanvas(this.width, this.height)
 		this.ctx = this.canvas.getContext('2d') as OffscreenCanvasRenderingContext2D
@@ -207,13 +203,11 @@ class CanvasDraw {
 		const {
 			color = '#ffffff',
 			width = this.width,
-			height = this.minSize * this.borderRatio,
+			height = this.minSize * (this.borderSize / 100),
 			x = 0,
-			y = this.height - this.minSize * this.borderRatio
+			y = this.height - this.minSize * (this.borderSize / 100)
 		} = options
-		if (this.mode === 'in' || !this.haveText) {
-			return
-		}
+
 		this.drawColorBackground({
 			color,
 			width,
@@ -227,17 +221,28 @@ class CanvasDraw {
 	 * @param options 配置
 	 */
 	drawBlurImage(options: BlurImageType) {
-		const { image, width = this.width, height = this.width, x = 0, y = 0, blur = 60 } = options
+		const { image, width = this.width, height = this.height, x = 0, y = 0, blur = 60 } = options
 
-		this.ctx.save()
-		this.ctx.filter = `blur(${blur}px)`
-		this.ctx.drawImage(image, x - width * 0.3, x - height * 0.3, width * 1.6, height * 1.6)
-		this.ctx.filter = 'none'
-		// 裁切
-		this.ctx.beginPath()
-		this.ctx.rect(x, y, width, height)
-		this.ctx.clip()
-		this.ctx.restore()
+		// 保存原始上下文状态
+		this.ctx.save();
+		// 预填充背景色（关键步骤）
+		this.ctx.fillStyle = "#FFFFFF"; // 根据实际背景色修改
+		this.ctx.fillRect(x, y, width, height);
+		// 扩展绘制区域（模糊补偿）
+		const blurCompensation = blur * 3; // 模糊扩散补偿量
+		this.ctx.filter = `blur(${blur}px)`;
+		// 扩大绘制范围（坐标偏移 + 尺寸扩展）
+		this.ctx.drawImage(
+			image,
+			x - blurCompensation / 2,          // X 偏移补偿
+			y - blurCompensation / 2,          // Y 偏移补偿
+			width + blurCompensation,        // 绘制宽度扩展
+			height + blurCompensation        // 绘制高度扩展
+		);
+		this.ctx.filter = 'none';
+
+		// 恢复上下文状态
+		this.ctx.restore();
 	}
 
 	/**
@@ -249,19 +254,15 @@ class CanvasDraw {
 			image,
 			width = this.width,
 			height = this.height,
-			ratio = 90,
 			shadow = 0.5,
-			radius = 5
+			radius = [5, 5, 5, 5]
 		} = options
 
-		const currentRatio = ratio / 100
 		const currentShadow = (shadow * this.minSize) / 10
-		const currentRadius = radius > 0 ? ((radius / 100) * this.minSize) : 0
+		const currentRadius = radius.map((item: number) => item > 0 ? ((item / 100) * this.minSize) : 0)
 
-		const bx = (width * (1 - currentRatio)) / 2
-		const by = (height * (1 - currentRatio)) / 2
-		const imgWidth = width * currentRatio
-		const imgHeight = height * currentRatio
+		const bx = this.minSize * (this.borderWidth[3] / 100)
+		const by = this.minSize * (this.borderWidth[0] / 100)
 
 		this.ctx.save()
 		// 绘制投影
@@ -274,11 +275,11 @@ class CanvasDraw {
 
 		// 绘制圆角矩形
 		this.ctx.beginPath()
-		this.ctx.roundRect(bx, by, imgWidth, imgHeight, currentRadius)
+		this.ctx.roundRect(bx, by, width, height, currentRadius)
 		this.ctx.fill()
 		this.ctx.clip()
 
-		this.ctx.drawImage(image, bx, by, width * currentRatio, height * currentRatio)
+		this.ctx.drawImage(image, bx, by, width, height)
 		this.ctx.restore()
 	}
 
@@ -287,22 +288,22 @@ class CanvasDraw {
 	 * @param items 图片和文本配置数组
 	 */
 	drawItems(options: ImageTextType) {
-		const { items, x = 'center', y } = options
+		const { items, x = 'center', y, positionOptions } = options
 		let totalWidth = 0
 		let maxHeight = 0
 
-		const borderHeight = this.minSize * this.borderRatio
+		const borderHeight = this.minSize * (this.borderSize / 100)
 
-		// 如果 mode 为 in，不考虑边框位置，文本在主图中
-		const bx = this.mode === 'out' ? 0.05 : (1 - this.ratio / 100) / 2 + 0.02
-		const by = this.mode === 'out' ? 0 : (1 - this.ratio / 100) / 2
+		const bl = (this.borderWidth[3]) / 100
+		const br = (this.borderWidth[1]) / 100
+		const by = 0
 
 		// 计算绘制的位置
-		let yPosition = this.height * (1 - by) - 0.5 * borderHeight
+		let yPosition = this.height * (1 - by) - positionOptions[1] * borderHeight
 		if (y === 1) {
-			yPosition = this.height * (1 - by) - 0.7 * borderHeight
+			yPosition = this.height * (1 - by) - positionOptions[2] * borderHeight
 		} else if (y === 2) {
-			yPosition = this.height * (1 - by) - 0.3 * borderHeight
+			yPosition = this.height * (1 - by) - positionOptions[0] * borderHeight
 		}
 
 		// 首先计算所有元素的总宽度和最大高度
@@ -342,15 +343,16 @@ class CanvasDraw {
 				maxHeight = Math.max(maxHeight, fontSize)
 			}
 		}
-		let currentX: number = this.width * bx
+		let currentX: number = this.minSize * bl
 		switch (x) {
 			case 'center':
 				currentX = (this.width - totalWidth) / 2
 				break
 			case 'left':
+				currentX = this.minSize * bl
 				break
 			case 'right':
-				currentX = this.width * (1 - bx) - totalWidth
+				currentX = this.width - this.minSize * br - totalWidth
 				break
 			default:
 				currentX = (this.width - totalWidth) / 2
@@ -414,7 +416,7 @@ class CanvasDraw {
 		if (!image) return
 
 		// 计算出水印的宽高
-		let borderHeight = this.minSize * this.borderRatio
+		let borderHeight = this.minSize * (this.borderSize / 100)
 
 		const h = size * borderHeight
 		const w = (h / image.height) * image.width
@@ -472,8 +474,9 @@ class CanvasDraw {
 	/**
 	 * 获取canvas blob
 	 */
-	async getBlob() {
-		return await this.canvas.convertToBlob()
+	async getBlob(params: { type?: string; quality?: number }) {
+		const { type = 'image/jpg', quality = 0.9 } = params
+		return await this.canvas.convertToBlob({ type, quality })
 	}
 
 	/**

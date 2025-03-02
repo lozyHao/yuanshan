@@ -14,6 +14,8 @@ declare module 'vue' {
     NButton: typeof import('naive-ui')['NButton']
     NCheckbox: typeof import('naive-ui')['NCheckbox']
     NCheckboxGroup: typeof import('naive-ui')['NCheckboxGroup']
+    NCollapse: typeof import('naive-ui')['NCollapse']
+    NCollapseItem: typeof import('naive-ui')['NCollapseItem']
     NColorPicker: typeof import('naive-ui')['NColorPicker']
     NConfigProvider: typeof import('naive-ui')['NConfigProvider']
     NDialogProvider: typeof import('naive-ui')['NDialogProvider']
@@ -51,5 +53,6 @@ declare module 'vue' {
     PopTextTemplateEdit: typeof import('./src/components/PopTextTemplateEdit.vue')['default']
     TitleBar: typeof import('./src/components/TitleBar.vue')['default']
     UploadFile: typeof import('./src/components/UploadFile.vue')['default']
+    YSlider: typeof import('./src/components/YSlider.vue')['default']
   }
 }

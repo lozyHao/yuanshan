@@ -3,8 +3,8 @@ import {
 	WeatherSunnyLow20Regular,
 	WeatherMoon24Regular,
 	Settings24Filled,
-	// QuestionCircle24Regular,
-	// Star24Regular,
+	QuestionCircle24Regular,
+	Star24Regular,
 	Toolbox24Filled,
 	DrawText20Filled
 } from '@vicons/fluent'
@@ -36,6 +36,40 @@ const translateY = computed(() => {
 	return 'translate-y--8'
 })
 
+// 问题解答列表
+const questionOptions = [
+	{
+		id: 1,
+		title: '输出设置目录',
+		content: '首页—>配置—>输出目录。输出格式：支持png、jpeg和webp三种格式输出。'
+	},
+	{
+		id: 2,
+		title: '水印和边框区别',
+		content: '水印是存在图片内部的图片内容；边框是相机exif信息内容和自定义内容的展示。'
+	},
+	{
+		id: 3,
+		title: '文字模板',
+		content: '是相机参数的组合内容，默认使用文字模板样式。'
+	},
+	{
+		id: 4,
+		title: '相机参数',
+		content: '照片自带的exif信息，如果是利用修图软件ps、lr等，在导出照片时勾选“元数据”选项，否则导出照片中无exif信息，在读取时就无法读取到。可通过强制替换样式优先使用。'
+	},
+	{
+		id: 5,
+		title: '自定义相机参数',
+		content: '除相机exif信息外的自定义内容，可以是文本，也可以是图片，注意文本不要过长，否则生成UI不美观。'
+	},
+	{
+		id: 6,
+		title: '文字中线设置',
+		content: '文字模板—>标题后按钮—>设置。通过设置文字中线和字体大小来控制文字每一行的位置。'
+	}
+];
+
 const onChange = () => {
 	themeStore.setTheme()
 }
@@ -51,6 +85,7 @@ const onClear = () => {
 				break
 			case 'text':
 				textStore.reset()
+				textStore.resetTextPosition()
 				break
 			case 'lens':
 				lensStore.reset()
@@ -93,6 +128,25 @@ onMounted(() => {
 			<span class="color-013D3A font-bold text-base ml-2">远 山</span>
 		</div>
 		<div class="drag-box flex-1 h-full"></div>
+		<n-popover trigger="hover" :show-arrow="false">
+			<template #trigger>
+				<div class="menu-hover flex items-center p-1 rounded-md transition-colors cursor-pointer">
+					<div class="w-8 h-8 flex items-center justify-center">
+						<n-icon size="24" class="color3">
+							<QuestionCircle24Regular />
+						</n-icon>
+					</div>
+				</div>
+			</template>
+			<div class="list w-100">
+				<div class="color3 py-2 mb-4 text-center bg-color13 rounded-lg">使用说明</div>
+				<n-collapse accordion arrow-placement="right">
+					<n-collapse-item v-for="item in questionOptions" :key="item.id" :title="item.title" :name="item.id">
+						<div>{{ item.content }}</div>
+					</n-collapse-item>
+				</n-collapse>
+			</div>
+		</n-popover>
 		<n-popover trigger="hover" :show-arrow="false">
 			<template #trigger>
 				<div class="flex-center menu-hover w-12 h-12 cursor-pointer transition-all">
@@ -176,22 +230,20 @@ onMounted(() => {
 						</div>
 						<span class="color3 pl-2">切换主题</span>
 					</div>
-					<!-- <div class="menu-hover flex items-center p-1 rounded-md transition-colors cursor-pointer">
-						<div class="w-8 h-8 flex items-center justify-center">
-							<n-icon size="24" class="color3">
-								<QuestionCircle24Regular />
-							</n-icon>
-						</div>
-						<span class="color3 pl-2">常见问题解答</span>
-					</div>
-					<div class="menu-hover flex items-center p-1 rounded-md transition-colors cursor-pointer">
-						<div class="w-8 h-8 flex items-center justify-center">
-							<n-icon size="24" class="color3">
-								<Star24Regular />
-							</n-icon>
-						</div>
-						<span class="color3 pl-2">支持一下</span>
-					</div> -->
+					<n-popover trigger="hover" placement="left-start" :show-arrow="false">
+						<template #trigger>
+							<div class="menu-hover flex items-center p-1 rounded-md transition-colors cursor-pointer">
+								<div class="w-8 h-8 flex items-center justify-center">
+									<n-icon size="24" class="color3">
+										<Star24Regular />
+									</n-icon>
+								</div>
+								<span class="color3 pl-2">支持一下</span>
+							</div>
+						</template>
+						<img class="w-50 h-50 rounded-lg" src="@renderer/assets/images/support_me.png" alt="">
+					</n-popover>
+
 				</div>
 			</n-popover>
 		</div>

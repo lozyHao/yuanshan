@@ -1,13 +1,12 @@
 import { getUUID } from '@renderer/utils/uuid'
-
 import ExifFactory from './exifFactory'
 import {
 	ImageTextItem,
 	OptionBasicValues,
 	OutputStatusEnum,
+	TextPositionValues,
 	TextTemplatePositionEnum
 } from '@renderer/interfaces/options'
-
 
 class ImageData {
 	key: string
@@ -43,12 +42,13 @@ class ImageData {
 			basic: OptionBasicValues
 			textList: { [key: string]: { items: ImageTextItem[]; x: TextTemplatePositionEnum }[] }
 		},
-		type: string = 'preview'
+		textPosition: TextPositionValues,
+		type: string = 'preview',
 	) {
 		if (type === 'preview') {
-			await this.startPreview(params)
+			await this.startPreview({ ...params, textPosition })
 		} else {
-			await this.startOutput(params)
+			await this.startOutput({ ...params, textPosition })
 		}
 	}
 
@@ -56,6 +56,7 @@ class ImageData {
 	async startPreview(params: {
 		basic: OptionBasicValues
 		textList: { [key: string]: { items: ImageTextItem[]; x: TextTemplatePositionEnum }[] }
+		textPosition: TextPositionValues
 	}) {
 		this.progress = 0
 		this.preLoading = true
@@ -82,12 +83,13 @@ class ImageData {
 				height ?? img.height,
 				'preview',
 				currentParams.basic.outputQuality,
-				(result: number | Blob) => {
+				params.textPosition,
+				(result: number | { url: Blob, outputFormat: string }) => {
 					console.log(`${this.filename} 进度：`, result)
 					if (typeof result === 'number') {
 						this.progress = result
 					} else {
-						this.outerUrl = URL.createObjectURL(result)
+						this.outerUrl = URL.createObjectURL(result.url)
 						this.preLoading = false
 					}
 				}
@@ -99,6 +101,7 @@ class ImageData {
 	async startOutput(params: {
 		basic: OptionBasicValues
 		textList: { [key: string]: { items: ImageTextItem[]; x: TextTemplatePositionEnum }[] }
+		textPosition: TextPositionValues
 	}) {
 		const img = new Image()
 		const src = URL.createObjectURL(this.file as File)
@@ -127,17 +130,19 @@ class ImageData {
 					height ?? img.height,
 					'output',
 					currentParams.basic.outputQuality,
-					async (message: number | Blob) => {
+					params.textPosition,
+					async (message: number | { url: Blob, outputFormat: string }) => {
 						if (typeof message === 'number') {
 							this.outputPercent = message
 						} else {
-							const arrayBuffer = await blobToArrayBuffer(message)
+							const arrayBuffer = await blobToArrayBuffer(message.url)
 
 							if (!arrayBuffer) resolve(null)
 							this.outputStatus = OutputStatusEnum.SAVE
 							const result = await (window.api as any).sendSaveFile({
 								imageArrayBuffer: arrayBuffer,
 								dir: params.basic.outputPath,
+								outputFormat: message.outputFormat
 							})
 							if (result) {
 								this.outputStatus = OutputStatusEnum.SUCCESS
@@ -162,7 +167,8 @@ class ImageData {
 		height: number,
 		type: string = 'preview',
 		quality: number = 90,
-		callback: (result: number | Blob) => void
+		textPosition: TextPositionValues,
+		callback: (result: number | { url: Blob, outputFormat: string }) => void
 	) {
 		const { basic, textList } = params
 
@@ -178,9 +184,9 @@ class ImageData {
 		const canvasDraw = new CanvasDraw.default(
 			width,
 			height,
-			basic.pattern,
 			basic.textBgColorUsed,
-			basic.mainImgSize,
+			basic.borderWidth,
+			basic.borderSize,
 			haveText
 		)
 
@@ -188,7 +194,7 @@ class ImageData {
 		if (basic.bgColorUsed) {
 			canvasDraw.drawColorBackground({ color: basic.bgColor })
 		} else {
-			canvasDraw.drawBlurImage({ image, width, height, blur: basic.bgBlur })
+			canvasDraw.drawBlurImage({ image, width: undefined, height: undefined, blur: basic.bgBlur })
 		}
 		callback(40)
 
@@ -198,7 +204,6 @@ class ImageData {
 			width,
 			height,
 			shadow: basic.shadowSize,
-			ratio: basic.mainImgSize,
 			radius: basic.roundedSize
 		})
 		callback(50)
@@ -227,7 +232,8 @@ class ImageData {
 				canvasDraw.drawItems({
 					items: item.items,
 					x: 'left',
-					y: textList.left.length === 1 ? 0 : i + 1
+					y: textList.left.length === 1 ? 0 : i + 1,
+					positionOptions: textPosition.headerTextPosition
 				})
 			}
 		}
@@ -239,7 +245,8 @@ class ImageData {
 				canvasDraw.drawItems({
 					items: item.items,
 					x: 'center',
-					y: textList.center.length === 1 ? 0 : i + 1
+					y: textList.center.length === 1 ? 0 : i + 1,
+					positionOptions: textPosition.middleTextPosition
 				})
 			}
 		}
@@ -251,19 +258,21 @@ class ImageData {
 				canvasDraw.drawItems({
 					items: item.items,
 					x: 'right',
-					y: textList.right.length === 1 ? 0 : i + 1
+					y: textList.right.length === 1 ? 0 : i + 1,
+					positionOptions: textPosition.footerTextPosition
 				})
 			}
 		}
 
-		const imageDataURL: Blob = await canvasDraw.getBlob()
+		console.log(basic.outputFormat, quality)
+		const imageDataURL: Blob = await canvasDraw.getBlob({ type: basic.outputFormat, quality: quality / 100 })
 		if (type === 'preview') {
 			callback(100)
 		} else {
 			callback(95)
 		}
 
-		callback(imageDataURL)
+		callback({ url: imageDataURL, outputFormat: basic.outputFormat })
 	}
 
 

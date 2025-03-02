@@ -10,9 +10,11 @@ import {
 	OptionBasicValues,
 	OptionTextTemplateValues,
 	OptionLensValues,
+	TextPositionValues,
 } from "@renderer/interfaces/options";
 
 import FileWorker from "@renderer/hooks/fileWorker.ts?worker";
+
 
 /**
  * 处理的文件列表
@@ -77,8 +79,9 @@ export const useFileStore = defineStore("file", () => {
 		basic: OptionBasicValues;
 		text: OptionTextTemplateValues[];
 		lens: OptionLensValues[];
+		textPosition: TextPositionValues
 	}) => {
-		const { basic, text, lens } = options;
+		const { basic, text, lens, textPosition } = options;
 		const data = await getParams({
 			exif: _imageData.value[_currentPreIndex.value].exif,
 			basic,
@@ -86,7 +89,7 @@ export const useFileStore = defineStore("file", () => {
 			lens,
 		});
 		// 开启预览
-		_imageData.value[_currentPreIndex.value].onPrint(data);
+		_imageData.value[_currentPreIndex.value].onPrint(data, textPosition);
 	};
 
 	// 开始输出
@@ -94,8 +97,9 @@ export const useFileStore = defineStore("file", () => {
 		basic: OptionBasicValues;
 		text: OptionTextTemplateValues[];
 		lens: OptionLensValues[];
+		textPosition: TextPositionValues
 	}) => {
-		const { basic, text, lens } = options;
+		const { basic, text, lens, textPosition } = options;
 
 		if (fileLength.value === 0) return;
 
@@ -116,7 +120,7 @@ export const useFileStore = defineStore("file", () => {
 		// 添加任务
 		for (let i = 1; i <= fileLength.value; i++) {
 			taskQueue.value.addTask(
-				async () => await _imageData.value[i - 1].onPrint(data, "output"),
+				async () => await _imageData.value[i - 1].onPrint(data, textPosition, "output"),
 			);
 		}
 
