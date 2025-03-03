@@ -39,10 +39,6 @@
 
 <img src="./static/4-自定义图片水印上传+自定义位置.png" height="300" />
 
-### 边框在主图内部
-
-<img src="./static/5-边框在主图内部.png" height="300" />
-
 ### 自定义图片+文字
 
 <img src="./static/7-自定义图片+文字.png" height="300" />
