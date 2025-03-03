@@ -229,15 +229,26 @@ class CanvasDraw {
 		this.ctx.fillStyle = "#FFFFFF"; // 根据实际背景色修改
 		this.ctx.fillRect(x, y, width, height);
 		// 扩展绘制区域（模糊补偿）
-		const blurCompensation = blur * 3; // 模糊扩散补偿量
-		this.ctx.filter = `blur(${blur}px)`;
+
 		// 扩大绘制范围（坐标偏移 + 尺寸扩展）
+		for (let i = 3; i >0; i--) {
+			const blurCompensation = blur * (i * 2); // 模糊扩散补偿量
+			this.ctx.filter = `blur(${blur}px)`;
+			this.ctx.drawImage(
+				image,
+				x - blurCompensation / 2,          // X 偏移补偿
+				y - blurCompensation / 2,          // Y 偏移补偿
+				width + blurCompensation,        // 绘制宽度扩展
+				height + blurCompensation        // 绘制高度扩展
+			);
+		}
+		this.ctx.filter = `blur(${blur}px)`;
 		this.ctx.drawImage(
 			image,
-			x - blurCompensation / 2,          // X 偏移补偿
-			y - blurCompensation / 2,          // Y 偏移补偿
-			width + blurCompensation,        // 绘制宽度扩展
-			height + blurCompensation        // 绘制高度扩展
+			x - blur / 2,          // X 偏移补偿
+			y - blur / 2,          // Y 偏移补偿
+			width + blur,        // 绘制宽度扩展
+			height + blur        // 绘制高度扩展
 		);
 		this.ctx.filter = 'none';
 

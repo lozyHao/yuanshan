@@ -146,18 +146,6 @@ watch(
 					<n-input v-model:value="formValue.name" :disabled="formValue.type === 0"></n-input>
 				</n-gi>
 				<n-gi class="flex-end" :span="1">
-					<must-text label="前缀"></must-text>
-				</n-gi>
-				<n-gi :span="2">
-					<n-input v-model:value="formValue.prefix"></n-input>
-				</n-gi>
-				<n-gi class="flex-end" :span="1">
-					<must-text label="后缀"></must-text>
-				</n-gi>
-				<n-gi :span="2">
-					<n-input v-model:value="formValue.suffix"></n-input>
-				</n-gi>
-				<n-gi class="flex-end" :span="1">
 					<must-text label="内容"></must-text>
 				</n-gi>
 				<n-gi class="flex-start" :span="2">
@@ -179,6 +167,14 @@ watch(
 							@on-change="($event) => (formValue.contentImage = $event)"></upload-file>
 						<camera-select @on-choose="($event) => (formValue.contentImage = $event)"></camera-select>
 					</n-space>
+				</n-gi>
+				<n-gi class="flex-end" :span="1">前缀</n-gi>
+				<n-gi :span="2">
+					<n-input v-model:value="formValue.prefix"></n-input>
+				</n-gi>
+				<n-gi class="flex-end" :span="1">后缀</n-gi>
+				<n-gi :span="2">
+					<n-input v-model:value="formValue.suffix"></n-input>
 				</n-gi>
 				<!-- 文字样式在类型为文字时使用 -->
 				<n-gi class="flex-center color6 font-bold text-base" :span="6"> 文字样式 </n-gi>
