@@ -103,12 +103,6 @@ export const useFileStore = defineStore("file", () => {
 
 		if (fileLength.value === 0) return;
 
-		const data = await getParams({
-			exif: _imageData.value[_currentPreIndex.value].exif,
-			basic,
-			text,
-			lens,
-		});
 		//    通过并发量控制
 		_outputLoading.value = true
 		taskQueue.value = new TaskQueue(3, (_total, _completed, _uncompleted, allCompleted) => {
@@ -119,6 +113,12 @@ export const useFileStore = defineStore("file", () => {
 
 		// 添加任务
 		for (let i = 1; i <= fileLength.value; i++) {
+			const data = await getParams({
+				exif: _imageData.value[i - 1].exif,
+				basic,
+				text,
+				lens,
+			});
 			taskQueue.value.addTask(
 				async () => await _imageData.value[i - 1].onPrint(data, textPosition, "output"),
 			);
