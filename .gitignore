@@ -1,6 +1,7 @@
 node_modules
 dist
 out
+contribute
 .DS_Store
 *.log*
 
