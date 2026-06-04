@@ -26,13 +26,12 @@ const penSize = ref(6);
 
 const isDraw = ref(true) // true 为画笔 false 为橡皮擦
 
-// 存储鼠标按下时的坐标
-let startX = 0;
-let startY = 0;
-
 // 存储上一次鼠标移动的坐标
 let prevX = 0;
 let prevY = 0;
+
+// 当前笔画的采样点，用于中点二次贝塞尔平滑
+let points = [];
 
 // 用于判断鼠标是否按下
 let isDrawing = false;
@@ -76,54 +75,82 @@ const clear = () => {
 	isDraw.value = true
 }
 
+// 将鼠标坐标转换为画布内部坐标（兼容画布位图尺寸与 CSS 显示尺寸不一致的情况）
+const getPos = (e) => {
+	const rect = canvas.value.getBoundingClientRect();
+	const scaleX = canvas.value.width / rect.width;
+	const scaleY = canvas.value.height / rect.height;
+	return {
+		x: (e.clientX - rect.left) * scaleX,
+		y: (e.clientY - rect.top) * scaleY
+	};
+};
+
 // 鼠标按下事件处理函数
 const startDrawing = (e) => {
 	isDrawing = true;
-	const startX = e.clientX - canvas.value.getBoundingClientRect().left;
-	const startY = e.clientY - canvas.value.getBoundingClientRect().top;
-	prevX = startX;
-	prevY = startY;
+	const { x, y } = getPos(e);
+	prevX = x;
+	prevY = y;
+	points = [{ x, y }];
 
 	ctx.strokeStyle = penColor.value;
-	ctx.lineJoin = "round";
-	ctx.lineCap = "round";
+	ctx.fillStyle = penColor.value;
+	ctx.lineWidth = penSize.value;
+	ctx.lineJoin = 'round';
+	ctx.lineCap = 'round';
+
+	// 单击即落点：先画一个圆点，避免点一下没有痕迹
+	ctx.beginPath();
+	ctx.arc(x, y, penSize.value / 2, 0, Math.PI * 2);
+	ctx.fill();
 };
 
-// 贝塞尔曲线绘制
+// 平滑连续绘制：经过相邻采样点中点的二次贝塞尔曲线，保证笔迹连贯、不断点
 const draw = (e) => {
 	if (!isDrawing) return;
 
-	const currentX = e.clientX - canvas.value.getBoundingClientRect().left;
-	const currentY = e.clientY - canvas.value.getBoundingClientRect().top;
+	const { x, y } = getPos(e);
+	points.push({ x, y });
 
-	// 根据鼠标移动的距离计算速度，这里简单地通过两点间的距离来估算
-	const distance = Math.sqrt((currentX - prevX) ** 2 + (currentY - prevY) ** 2);
-	// 根据速度调整画笔粗细，距离越大（速度越快），画笔越细
-	const dynamicPenSize = Math.max(1, penSize.value - distance / 6);
-
-	ctx.beginPath();
-	ctx.lineWidth = dynamicPenSize;
+	ctx.lineWidth = penSize.value;
 	ctx.strokeStyle = penColor.value;
 
-	// 使用贝塞尔曲线绘制
-	ctx.moveTo(prevX, prevY);
-	// 设置贝塞尔曲线的控制点，这里简单地将控制点设置为当前点和上一点的中间位置
-	const controlX = (prevX + currentX) / 2;
-	const controlY = (prevY + currentY) / 2;
-	ctx.bezierCurveTo(controlX, controlY, controlX, controlY, currentX, currentY);
-	ctx.stroke();
+	const n = points.length;
+	if (n < 3) {
+		// 起笔阶段采样点不足，先用直线连接
+		ctx.beginPath();
+		ctx.moveTo(prevX, prevY);
+		ctx.lineTo(x, y);
+		ctx.stroke();
+	} else {
+		// 以上一个采样点为控制点，前后两段中点为起止点，分段衔接成平滑曲线
+		const p0 = points[n - 3];
+		const p1 = points[n - 2];
+		const p2 = points[n - 1];
+		const mid1 = { x: (p0.x + p1.x) / 2, y: (p0.y + p1.y) / 2 };
+		const mid2 = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
+		ctx.beginPath();
+		ctx.moveTo(mid1.x, mid1.y);
+		ctx.quadraticCurveTo(p1.x, p1.y, mid2.x, mid2.y);
+		ctx.stroke();
+	}
 
-	prevX = currentX;
-	prevY = currentY;
+	prevX = x;
+	prevY = y;
 }
 // 擦除函数
 const eraseX = ref(0)
 const eraseY = ref(0)
 const isErase = ref(false)
 const erase = (e) => {
+	const { x: currentX, y: currentY } = getPos(e);
 
-	const currentX = e.clientX - canvas.value.getBoundingClientRect().left;
-	const currentY = e.clientY - canvas.value.getBoundingClientRect().top;
+	// 更新橡皮擦预览框位置
+	eraseX.value = currentX - penSize.value / 2
+	eraseY.value = currentY - penSize.value / 2
+
+	if (!isDrawing) return;
 
 	// 获取需要擦除区域的图像数据
 	const imageData = ctx.getImageData(
@@ -134,10 +161,6 @@ const erase = (e) => {
 	);
 	const pixels = imageData.data;
 
-	eraseX.value = currentX - penSize.value / 2
-	eraseY.value = currentY - penSize.value / 2
-
-	if (!isDrawing) return;
 	// 将擦除区域内像素的透明度设置为0
 	for (let i = 3; i < pixels.length; i += 4) {
 		pixels[i] = 0;

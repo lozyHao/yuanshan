@@ -41,8 +41,10 @@ const handleFileOpen = async () => {
 		)
 
 		return { status: true, msg: '成功', fileDir: uploadedFiles }
-	} catch (error: any) {
-		return { status: false, msg: '失败', fileDir: null }
+	} catch (error) {
+		const msg = error instanceof Error ? error.message : String(error)
+		console.error('文件复制失败:', msg)
+		return { status: false, msg: `失败: ${msg}`, fileDir: null }
 	}
 }
 
@@ -81,21 +83,20 @@ const handleSaveFiles = async (params: {
 }) => {
 	const { imageArrayBuffer, dir, outputFormat = "image/jpeg" } = params
 
-	//   确保临时目录存在
+	//   确保目标目录存在
 	if (!fs.existsSync(dir)) {
 		await fs.promises.mkdir(dir, { recursive: true })
 	}
 
-	// eslint-disable-next-line no-async-promise-executor
-	return await new Promise(async (resolve) => {
-		const fileName = Date.now() + '.' + outputFormat.split('/')[1]
-		try {
-			await fs.promises.writeFile(dir + '/' + fileName, Buffer.from(imageArrayBuffer), 'binary')
-			resolve(true)
-		} catch (error) {
-			resolve(false)
-		}
-	})
+	const fileName = Date.now() + '.' + outputFormat.split('/')[1]
+	try {
+		await fs.promises.writeFile(path.join(dir, fileName), Buffer.from(imageArrayBuffer))
+		return true
+	} catch (error) {
+		const msg = error instanceof Error ? error.message : String(error)
+		console.error('保存文件失败:', msg)
+		return false
+	}
 }
 
 export default start

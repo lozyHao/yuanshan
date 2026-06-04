@@ -1,17 +1,27 @@
 // WorkerManager
+type WorkerCallback<R = unknown> = (result: R) => void
+
+interface WorkerMessage {
+  callbackId?: string
+  result?: unknown
+  [key: string]: unknown
+}
+
 class WorkerManager {
-  workers: { [workerName: string]: Worker }
-  callbacks: { [key: string]: (result: any) => void } = {}
+  workers: { [workerName: string]: Worker } = {}
+  callbacks: { [key: string]: WorkerCallback } = {}
+  private seq = 0
 
-  constructor() {
-    this.workers = {}
-  }
-
-  createWorker(workerName: string, DefinedWorker: any) {
+  createWorker(workerName: string, DefinedWorker: new () => Worker): Worker {
     const worker = new DefinedWorker()
-    worker.onmessage = (event) => {
-      if (event.data.callbackId && this.callbacks[event.data.callbackId]) {
-        this.callbacks[event.data.callbackId](event.data.result)
+    worker.onmessage = (event: MessageEvent<WorkerMessage>) => {
+      const { callbackId, result } = event.data
+      if (callbackId && this.callbacks[callbackId]) {
+        this.callbacks[callbackId](result)
+        // 进度类消息会多次回调，仅在收到最终结果（对象）后释放，避免回调堆积
+        if (typeof result !== 'number') {
+          delete this.callbacks[callbackId]
+        }
       }
     }
 
@@ -23,17 +33,18 @@ class WorkerManager {
     return worker
   }
 
-  postMessage(workerName: string, message: any, callback: (result: any) => void) {
+  postMessage<R = unknown>(workerName: string, message: object, callback: WorkerCallback<R>): void {
     const worker = this.workers[workerName]
-    const callbackId = Math.random().toString(36).slice(2)
+    // 单调递增 id，避免 Math.random 的碰撞风险
+    const callbackId = `cb_${++this.seq}_${Date.now()}`
 
     if (worker && callback) {
-      this.callbacks[callbackId] = callback
+      this.callbacks[callbackId] = callback as WorkerCallback
       worker.postMessage({ ...message, callbackId })
     }
   }
 
-  terminateWorker(workerName: string) {
+  terminateWorker(workerName: string): void {
     const worker = this.workers[workerName]
     if (worker) {
       worker.terminate()
@@ -41,8 +52,7 @@ class WorkerManager {
     }
   }
 
-  delete(workerName: string) {
-    // delete this.callbacks[event.data.callbackId]; // 执行完毕后删除回调函数
+  delete(workerName: string): void {
     // 结束后，删除该 worker
     this.terminateWorker(workerName)
   }

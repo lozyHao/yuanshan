@@ -3,20 +3,20 @@
 export async function getImageBitmap(url: string | File): Promise<{ image: ImageBitmap, width: number, height: number } | null> {
 	if (!url) return null
 	const img = new Image();
-	if (typeof url === 'string') {
-		img.src = url;
-	} else {
-		img.src = URL.createObjectURL(url);
-	}
+	// 由 File 创建的 objectURL 需在用完后释放
+	const objectUrl = typeof url === 'string' ? null : URL.createObjectURL(url);
+	img.src = objectUrl ?? (url as string);
 
 	return await new Promise<{ image: ImageBitmap, width: number, height: number } | null>((resolve) => {
 		img.onload = async () => {
 			const imageBitmap = await createImageBitmap(img);
 			const { width, height } = imageBitmap
+			if (objectUrl) URL.revokeObjectURL(objectUrl);
 			resolve({ image: imageBitmap, width, height });
 		};
 
 		img.onerror = () => {
+			if (objectUrl) URL.revokeObjectURL(objectUrl);
 			resolve(null);
 		}
 	})

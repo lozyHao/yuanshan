@@ -1,7 +1,7 @@
 /**
  * 通用配置
  */
-import { defineStore } from 'pinia'
+import { acceptHMRUpdate, defineStore } from 'pinia'
 import { ref } from 'vue'
 import { OptionLensValues, OptionLensEnum } from '@renderer/interfaces/options'
 import { exifFields } from '@renderer/default/default-options'
@@ -57,6 +57,13 @@ export const useOptionLensStore = defineStore(
       return [..._data.value]
     }
 
+    // 整体导入相机参数模板
+    const setAll = (data: OptionLensValues[]) => {
+      if (Array.isArray(data)) {
+        _data.value = [...data]
+      }
+    }
+
     // 恢复默认
     const reset = () => {
       _data.value = [...exifFields]
@@ -70,6 +77,7 @@ export const useOptionLensStore = defineStore(
       handleChange,
       del,
       getValue,
+      setAll,
       reset
     }
   },
@@ -80,3 +88,8 @@ export const useOptionLensStore = defineStore(
     }
   }
 )
+
+// 支持 HMR：修改本 store 文件后热更新会替换实例，避免出现旧实例方法缺失
+if (import.meta.hot) {
+  import.meta.hot.accept(acceptHMRUpdate(useOptionLensStore, import.meta.hot))
+}

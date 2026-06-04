@@ -1,8 +1,10 @@
+type Task = () => Promise<unknown> | unknown
+
 class TaskQueue {
 	maxConcurrentTasks: number
 	currentTaskCount: number
-	queue: any[]
-	semaphore: any
+	queue: Task[]
+	semaphore: (() => void)[]
 	//   事件监听进度（总量，已完成数，未完成数，所有都完成）
 	onProgress: (total: number, completed: number, uncompleted: number, allCompleted: boolean) => void
 
@@ -24,13 +26,12 @@ class TaskQueue {
 	}
 
 	// 添加任务到队列
-	addTask(task) {
-		console.log(task)
+	addTask(task: Task) {
 		this.queue.push(task)
 	}
 
 	// 执行任务
-	async executeTask(task) {
+	async executeTask(task: Task) {
 		try {
 			await task()
 		} catch (err) {
@@ -39,7 +40,6 @@ class TaskQueue {
 			this.currentTaskCount--
 			// 释放信号量
 			const released = this.semaphore.shift()
-			console.log('结束一个', released)
 			if (released) {
 				this.onProgress(
 					this.queue.length,
@@ -58,9 +58,10 @@ class TaskQueue {
 	async startNextTask() {
 		if (this.queue.length > 0 && this.currentTaskCount < this.maxConcurrentTasks) {
 			const task = this.queue.shift()
+			if (!task) return
 			this.currentTaskCount++
-			// 添加新的信号量
-			new Promise((resolve) => this.semaphore.push(resolve))
+			// 添加一个信号量占位，executeTask 完成时出队并上报进度
+			this.semaphore.push(() => {})
 			this.executeTask(task)
 		}
 	}

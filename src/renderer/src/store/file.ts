@@ -45,12 +45,13 @@ export const useFileStore = defineStore("file", () => {
 				{ data: files, currentFiles: currentFiles },
 				(message: { str: string; files: File[] }) => {
 					const { files, str } = message;
-					console.log("上传的文件", message);
 					if (files && files.length > 0) {
 						message.files.forEach((file: File) => {
 							_imageData.value.push(new ImageData(file));
 						});
 					}
+					// 任务完成，释放 worker，避免线程泄漏
+					worker.delete("addFiles");
 					setTimeout(() => {
 						_loading.value = false;
 						resolve(str);
@@ -63,6 +64,8 @@ export const useFileStore = defineStore("file", () => {
 	const removeFile = (key: string) => {
 		const index = _imageData.value.findIndex((item) => item.key === key);
 		if (index > -1) {
+			// 释放该图占用的 objectURL
+			_imageData.value[index].dispose();
 			_imageData.value.splice(index, 1);
 		}
 		if (index <= _currentPreIndex.value) {
@@ -130,6 +133,7 @@ export const useFileStore = defineStore("file", () => {
 
 	// 重置清空
 	const reset = () => {
+		_imageData.value.forEach((item) => item.dispose());
 		_imageData.value = [];
 		_currentPreIndex.value = 0;
 	};

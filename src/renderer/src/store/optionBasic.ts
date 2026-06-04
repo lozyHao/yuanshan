@@ -1,7 +1,7 @@
 /**
  * 通用配置
  */
-import { defineStore } from 'pinia'
+import { acceptHMRUpdate, defineStore } from 'pinia'
 import { ref } from 'vue'
 import {
 	OptionBasicValues,
@@ -10,28 +10,31 @@ import {
 	OutputFormatEnum
 } from '@renderer/interfaces/options'
 
+// 默认基础配置工厂（store 初始化、恢复默认、预设模板共用）
+export const createDefaultBasic = (): OptionBasicValues => ({
+	[OptionBasicEnum.OUTPUT_PATH]: null, // 输出目录
+	[OptionBasicEnum.OUTPUT_FORMAT]: OutputFormatEnum.JPG, // 输出格式
+	[OptionBasicEnum.TEXT_BG_COLOR]: '#000000', // 文字背景
+	[OptionBasicEnum.TEXT_BG_COLOR_USED]: false, // 文字背景是否启用
+	[OptionBasicEnum.WATERMARK]: null, //   水印
+	[OptionBasicEnum.WATERMARK_POSITION]: WatermarkPositionEnum.BOTTOM, // 水印位置
+	[OptionBasicEnum.WATERMARK_USED]: false, // 水印是否启用
+	[OptionBasicEnum.WATERMARK_SIZE]: 0.3, // 水印尺寸
+	[OptionBasicEnum.ROUNDED_SIZE]: [5, 5, 5, 5], // 圆角 ([左上, 右上, 右下, 左下])
+	[OptionBasicEnum.BORDER_WIDTH]: [5, 5, 5, 5], // 边框 ([上, 右, 下, 左])
+	[OptionBasicEnum.BORDER_SIZE]: 8, // 主边框
+	[OptionBasicEnum.SHADOW_SIZE]: 0.6, // 阴影大小
+	[OptionBasicEnum.BG_COLOR]: '#000000', // 背景颜色纯色
+	[OptionBasicEnum.BG_COLOR_USED]: false, // 背景颜色是否启用
+	[OptionBasicEnum.BG_BLUR]: 100, // 背景模糊
+	[OptionBasicEnum.ASPECT_RATIO_USED]: false, // 长宽比是否启用
+	[OptionBasicEnum.OUTPUT_QUALITY]: 100 // 输出质量
+})
+
 export const useOptionBasicStore = defineStore(
 	'optionBasic',
 	() => {
-		const _data = ref<OptionBasicValues>({
-			[OptionBasicEnum.OUTPUT_PATH]: null, // 输出目录
-			[OptionBasicEnum.OUTPUT_FORMAT]: OutputFormatEnum.JPG, // 输出格式
-			[OptionBasicEnum.TEXT_BG_COLOR]: '#000000', // 文字背景
-			[OptionBasicEnum.TEXT_BG_COLOR_USED]: false, // 文字背景是否启用
-			[OptionBasicEnum.WATERMARK]: null, //   水印
-			[OptionBasicEnum.WATERMARK_POSITION]: WatermarkPositionEnum.BOTTOM, // 水印位置
-			[OptionBasicEnum.WATERMARK_USED]: false, // 水印是否启用
-			[OptionBasicEnum.WATERMARK_SIZE]: 0.3, // 水印尺寸
-			[OptionBasicEnum.ROUNDED_SIZE]: [5, 5, 5, 5], // 圆角 ([左上, 右上, 右下, 左下])
-			[OptionBasicEnum.BORDER_WIDTH]: [5, 5, 5, 5], // 边框 ([上, 右, 下, 左])
-			[OptionBasicEnum.BORDER_SIZE]: 8, // 主边框
-			[OptionBasicEnum.SHADOW_SIZE]: 0.6, // 阴影大小
-			[OptionBasicEnum.BG_COLOR]: '#000000', // 背景颜色纯色
-			[OptionBasicEnum.BG_COLOR_USED]: false, // 背景颜色是否启用
-			[OptionBasicEnum.BG_BLUR]: 100, // 背景模糊
-			[OptionBasicEnum.ASPECT_RATIO_USED]: false, // 长宽比是否启用
-			[OptionBasicEnum.OUTPUT_QUALITY]: 100 // 输出质量
-		})
+		const _data = ref<OptionBasicValues>(createDefaultBasic())
 
 		// 设置
 		const set = <K extends keyof OptionBasicValues>(key: K, value: OptionBasicValues[K]) => {
@@ -50,27 +53,15 @@ export const useOptionBasicStore = defineStore(
 			}
 		}
 
+		// 整体导入（合并到当前配置，容忍缺失字段）
+		const setAll = (data: Partial<OptionBasicValues>) => {
+			if (!data || typeof data !== 'object') return
+			_data.value = { ..._data.value, ...data }
+		}
+
 		// 恢复默认
 		const reset = () => {
-			_data.value = {
-				[OptionBasicEnum.OUTPUT_PATH]: null, // 输出目录
-				[OptionBasicEnum.OUTPUT_FORMAT]: OutputFormatEnum.JPG, // 输出格式
-				[OptionBasicEnum.TEXT_BG_COLOR]: '#000000', // 文字背景
-				[OptionBasicEnum.TEXT_BG_COLOR_USED]: false, // 文字背景是否启用
-				[OptionBasicEnum.WATERMARK]: null, //   水印
-				[OptionBasicEnum.WATERMARK_POSITION]: WatermarkPositionEnum.BOTTOM, // 水印位置
-				[OptionBasicEnum.WATERMARK_USED]: false, // 水印是否启用
-				[OptionBasicEnum.WATERMARK_SIZE]: 0.3, // 水印尺寸
-				[OptionBasicEnum.ROUNDED_SIZE]: [5, 5, 5, 5], // 圆角
-				[OptionBasicEnum.BORDER_WIDTH]: [5, 5, 5, 5], // 边框
-				[OptionBasicEnum.BORDER_SIZE]: 8, // 主边框
-				[OptionBasicEnum.SHADOW_SIZE]: 0.6, // 阴影大小
-				[OptionBasicEnum.BG_COLOR]: '#000000', // 背景颜色纯色
-				[OptionBasicEnum.BG_COLOR_USED]: false, // 背景颜色是否启用
-				[OptionBasicEnum.BG_BLUR]: 100, // 背景模糊
-				[OptionBasicEnum.ASPECT_RATIO_USED]: false, // 长宽比是否启用
-				[OptionBasicEnum.OUTPUT_QUALITY]: 100 // 输出质量
-			}
+			_data.value = createDefaultBasic()
 		}
 
 		return {
@@ -78,6 +69,7 @@ export const useOptionBasicStore = defineStore(
 			set,
 			get,
 			getValue,
+			setAll,
 			reset
 		}
 	},
@@ -88,3 +80,8 @@ export const useOptionBasicStore = defineStore(
 		}
 	}
 )
+
+// 支持 HMR：修改本 store 文件后热更新会替换实例，避免出现旧实例方法缺失
+if (import.meta.hot) {
+	import.meta.hot.accept(acceptHMRUpdate(useOptionBasicStore, import.meta.hot))
+}

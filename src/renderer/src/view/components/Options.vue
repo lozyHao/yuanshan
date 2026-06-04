@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import OptionTemplate from "./OptionTemplate.vue";
 import OptionBasic from "./OptionBasic.vue";
 import OptionText from "./OptionText.vue";
 import OptionLens from "./OptionLens.vue";
@@ -15,6 +16,9 @@ import OptionLens from "./OptionLens.vue";
 			</n-tab-pane>
 			<n-tab-pane name="the beatles" tab="相机参数">
 				<option-lens></option-lens>
+			</n-tab-pane>
+			<n-tab-pane name="template" tab="模板">
+				<option-template></option-template>
 			</n-tab-pane>
 		</n-tabs>
 	</div>

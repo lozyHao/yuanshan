@@ -20,6 +20,9 @@ export const getParams = async (options: {
 }> => {
 	const { exif, basic, text, lens } = options
 
+	// 等待 EXIF 解析完成，避免读到空数据（构造时为异步加载）
+	await exif.ready
+
 	const allList = text.filter((item) => item.position !== 'no')
 	const list: { items: ImageTextItem[]; x: TextTemplatePositionEnum }[] = await getTemplate(
 		allList,
@@ -27,14 +30,8 @@ export const getParams = async (options: {
 		exif
 	)
 
-	// 过滤掉没有内容的项
-	const newList = list.filter((item) => {
-		if (item.items.length === 0) return false
-		return item.items.filter((item) => {
-			if (!item.content) return false
-			return true
-		})
-	})
+	// 过滤掉没有内容的分组（getTemplate 已逐项过滤，这里兜底丢弃空分组）
+	const newList = list.filter((item) => item.items.length > 0)
 
 	return {
 		basic: {
@@ -77,10 +74,15 @@ const getTemplate = async (
 
 				const len = lens.find((len) => len.key === key)
 
-				// 校验 这个key 在 exif 上是否存在
-				if (Object.prototype.hasOwnProperty.call(exif.exif, key)) {
-					// 获取exif的值
-					data.content = `${len?.prefix || ''}${exif.get(key)}${len?.suffix || ''}`
+				// 仅当 exif 中确有有效值时才拼接，避免把 undefined/null/NaN 绘制上去
+				const exifValue = exif.get(key)
+				const isInvalid =
+					exifValue === null ||
+					exifValue === undefined ||
+					exifValue === '' ||
+					(typeof exifValue === 'number' && Number.isNaN(exifValue))
+				if (!isInvalid) {
+					data.content = `${len?.prefix || ''}${exifValue}${len?.suffix || ''}`
 				}
 
 				if (len && !len.used) {
@@ -108,10 +110,15 @@ const getTemplate = async (
 				arr.push(data)
 			}
 
-			result.push({
-				items: arr,
-				x: item.position
-			})
+			// 过滤掉没有内容的项（如 exif 缺失、自定义内容为空），避免绘制空白/占位
+			const items = arr.filter((it) => it.content !== '' && it.content !== null && it.content !== undefined)
+
+			if (items.length > 0) {
+				result.push({
+					items,
+					x: item.position
+				})
+			}
 		}
 	}
 

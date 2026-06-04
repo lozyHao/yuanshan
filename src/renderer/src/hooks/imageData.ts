@@ -8,6 +8,11 @@ import {
 	TextTemplatePositionEnum
 } from '@renderer/interfaces/options'
 
+type TextList = { [key: string]: { items: ImageTextItem[]; x: TextTemplatePositionEnum }[] }
+type DrawParams = { basic: OptionBasicValues; textList: TextList }
+type OutputResult = { url: Blob; outputFormat: string }
+type DrawCallback = (result: number | OutputResult) => void
+
 class ImageData {
 	key: string
 	file: File | null
@@ -36,15 +41,32 @@ class ImageData {
 		return this.file ? URL.createObjectURL(this.file) : ''
 	}
 
+	/**
+	 * 将当前文件解码为 ImageBitmap，并在解码完成后释放临时 objectURL，避免内存泄漏。
+	 * startPreview / startOutput 共用此逻辑。
+	 */
+	private async loadBitmap(): Promise<{ imageBitmap: ImageBitmap; width: number; height: number }> {
+		const src = URL.createObjectURL(this.file as File)
+		try {
+			const img = new Image()
+			img.src = src
+			await new Promise<void>((resolve, reject) => {
+				img.onload = () => resolve()
+				img.onerror = () => reject(new Error('图片加载失败'))
+			})
+			const imageBitmap = await createImageBitmap(img)
+			return {
+				imageBitmap,
+				width: imageBitmap.width || img.width,
+				height: imageBitmap.height || img.height
+			}
+		} finally {
+			URL.revokeObjectURL(src)
+		}
+	}
+
 	/** 输出 */
-	async onPrint(
-		params: {
-			basic: OptionBasicValues
-			textList: { [key: string]: { items: ImageTextItem[]; x: TextTemplatePositionEnum }[] }
-		},
-		textPosition: TextPositionValues,
-		type: string = 'preview',
-	) {
+	async onPrint(params: DrawParams, textPosition: TextPositionValues, type: string = 'preview') {
 		if (type === 'preview') {
 			await this.startPreview({ ...params, textPosition })
 		} else {
@@ -53,127 +75,106 @@ class ImageData {
 	}
 
 	// 开始绘制预览
-	async startPreview(params: {
-		basic: OptionBasicValues
-		textList: { [key: string]: { items: ImageTextItem[]; x: TextTemplatePositionEnum }[] }
-		textPosition: TextPositionValues
-	}) {
+	async startPreview(params: DrawParams & { textPosition: TextPositionValues }) {
 		this.progress = 0
 		this.preLoading = true
 
-		const img = new Image()
-		const src = URL.createObjectURL(this.file as File)
-		img.src = src
+		const { imageBitmap, width, height } = await this.loadBitmap()
+		this.progress = 20
 
-		img.onload = async () => {
-			// blob 转 imageBitmap
-			const imageBitmap = await createImageBitmap(img)
-			const { width, height } = imageBitmap
-			this.progress = 20
-
-			// 解析参数，避免存在对象
-			const currentParams = {
-				basic: { ...params.basic },
-				textList: { ...params.textList }
-			}
-			this.outPut(
-				currentParams,
-				imageBitmap,
-				width ?? img.width,
-				height ?? img.height,
-				'preview',
-				currentParams.basic.outputQuality,
-				params.textPosition,
-				(result: number | { url: Blob, outputFormat: string }) => {
-					console.log(`${this.filename} 进度：`, result)
-					if (typeof result === 'number') {
-						this.progress = result
-					} else {
-						this.outerUrl = URL.createObjectURL(result.url)
-						this.preLoading = false
-					}
-				}
-			)
+		// 解析参数，避免存在对象
+		const currentParams = {
+			basic: { ...params.basic },
+			textList: { ...params.textList }
 		}
+
+		await this.outPut(
+			currentParams,
+			imageBitmap,
+			width,
+			height,
+			'preview',
+			currentParams.basic.outputQuality,
+			params.textPosition,
+			(result) => {
+				if (typeof result === 'number') {
+					this.progress = result
+				} else {
+					// 释放上一张预览图，避免每次重绘累积 blob
+					if (this.outerUrl) URL.revokeObjectURL(this.outerUrl)
+					this.outerUrl = URL.createObjectURL(result.url)
+					this.preLoading = false
+				}
+			}
+		)
 	}
 
 	// 开始输出
-	async startOutput(params: {
-		basic: OptionBasicValues
-		textList: { [key: string]: { items: ImageTextItem[]; x: TextTemplatePositionEnum }[] }
-		textPosition: TextPositionValues
-	}) {
-		const img = new Image()
-		const src = URL.createObjectURL(this.file as File)
-		img.src = src
+	async startOutput(params: DrawParams & { textPosition: TextPositionValues }) {
+		this.outputPercent = 0
+		this.outputStatus = OutputStatusEnum.LOADING
+
+		const { imageBitmap, width, height } = await this.loadBitmap()
+		this.outputPercent = 20
+
+		// 解析参数，避免存在对象
+		const currentParams = {
+			basic: { ...params.basic },
+			textList: { ...params.textList }
+		}
 
 		return await new Promise((resolve) => {
-			this.outputPercent = 0
-			this.outputStatus = OutputStatusEnum.LOADING
-			img.onload = async () => {
-				// blob 转 imageBitmap
-				const imageBitmap = await createImageBitmap(img)
-				const { width, height } = imageBitmap
-				this.outputPercent = 20
-
-				// 解析参数，避免存在对象
-				const currentParams = {
-					basic: { ...params.basic },
-					textList: { ...params.textList }
-				}
-
-
-				this.outPut(
-					currentParams,
-					imageBitmap,
-					width ?? img.width,
-					height ?? img.height,
-					'output',
-					currentParams.basic.outputQuality,
-					params.textPosition,
-					async (message: number | { url: Blob, outputFormat: string }) => {
-						if (typeof message === 'number') {
-							this.outputPercent = message
-						} else {
-							const arrayBuffer = await blobToArrayBuffer(message.url)
-
-							if (!arrayBuffer) resolve(null)
-							this.outputStatus = OutputStatusEnum.SAVE
-							const result = await (window.api as any).sendSaveFile({
-								imageArrayBuffer: arrayBuffer,
-								dir: params.basic.outputPath,
-								outputFormat: message.outputFormat
-							})
-							if (result) {
-								this.outputStatus = OutputStatusEnum.SUCCESS
-							} else {
-								this.outputStatus = OutputStatusEnum.FAIL
-							}
-
-							this.outputPercent = 100
-							resolve(result)
-						}
+			this.outPut(
+				currentParams,
+				imageBitmap,
+				width,
+				height,
+				'output',
+				currentParams.basic.outputQuality,
+				params.textPosition,
+				async (message) => {
+					if (typeof message === 'number') {
+						this.outputPercent = message
+						return
 					}
-				)
-			}
+
+					const arrayBuffer = await blobToArrayBuffer(message.url)
+					if (!arrayBuffer) {
+						this.outputStatus = OutputStatusEnum.FAIL
+						this.outputPercent = 100
+						resolve(null)
+						return
+					}
+
+					this.outputStatus = OutputStatusEnum.SAVE
+					const result = await (window.api as any).sendSaveFile({
+						imageArrayBuffer: arrayBuffer,
+						dir: params.basic.outputPath,
+						outputFormat: message.outputFormat
+					})
+					this.outputStatus = result ? OutputStatusEnum.SUCCESS : OutputStatusEnum.FAIL
+					this.outputPercent = 100
+					resolve(result)
+				}
+			)
 		})
 	}
 
 	// 输出工具
 	async outPut(
-		params: any,
+		params: DrawParams,
 		image: ImageBitmap,
 		width: number,
 		height: number,
 		type: string = 'preview',
 		quality: number = 90,
 		textPosition: TextPositionValues,
-		callback: (result: number | { url: Blob, outputFormat: string }) => void
+		callback: DrawCallback
 	) {
 		const { basic, textList } = params
 
-		width = parseFloat((width * quality / 100).toFixed(4))
-		height = parseFloat((height * quality / 100).toFixed(4))
+		width = parseFloat(((width * quality) / 100).toFixed(4))
+		height = parseFloat(((height * quality) / 100).toFixed(4))
 
 		// 判断是否有内容绘制
 		const haveText =
@@ -224,57 +225,37 @@ class ImageData {
 		}
 		callback(70)
 
-		// 绘制文字
-		// 绘制左侧
-		if (textList.left.length) {
-			for (let i = 0; i < textList.left.length; i++) {
-				const item = textList.left[i]
+		// 绘制某一侧（左/中/右）的文字，单条时 y=0，多条时按序号定位
+		const drawSide = (
+			side: { items: ImageTextItem[] }[],
+			x: 'left' | 'center' | 'right',
+			positionOptions: [number, number, number]
+		) => {
+			for (let i = 0; i < side.length; i++) {
 				canvasDraw.drawItems({
-					items: item.items,
-					x: 'left',
-					y: textList.left.length === 1 ? 0 : i + 1,
-					positionOptions: textPosition.headerTextPosition
-				})
-			}
-		}
-		callback(80)
-		// 绘制中间
-		if (textList.center.length) {
-			for (let i = 0; i < textList.center.length; i++) {
-				const item = textList.center[i]
-				canvasDraw.drawItems({
-					items: item.items,
-					x: 'center',
-					y: textList.center.length === 1 ? 0 : i + 1,
-					positionOptions: textPosition.middleTextPosition
-				})
-			}
-		}
-		callback(90)
-		// 绘制右侧
-		if (textList.right.length) {
-			for (let i = 0; i < textList.right.length; i++) {
-				const item = textList.right[i]
-				canvasDraw.drawItems({
-					items: item.items,
-					x: 'right',
-					y: textList.right.length === 1 ? 0 : i + 1,
-					positionOptions: textPosition.footerTextPosition
+					items: side[i].items,
+					x,
+					y: side.length === 1 ? 0 : i + 1,
+					positionOptions
 				})
 			}
 		}
 
-		console.log(basic.outputFormat, quality)
-		const imageDataURL: Blob = await canvasDraw.getBlob({ type: basic.outputFormat, quality: quality / 100 })
-		if (type === 'preview') {
-			callback(100)
-		} else {
-			callback(95)
-		}
+		// 绘制文字：左、中、右
+		drawSide(textList.left, 'left', textPosition.headerTextPosition)
+		callback(80)
+		drawSide(textList.center, 'center', textPosition.middleTextPosition)
+		callback(90)
+		drawSide(textList.right, 'right', textPosition.footerTextPosition)
+
+		const imageDataURL: Blob = await canvasDraw.getBlob({
+			type: basic.outputFormat,
+			quality: quality / 100
+		})
+		callback(type === 'preview' ? 100 : 95)
 
 		callback({ url: imageDataURL, outputFormat: basic.outputFormat })
 	}
-
 
 	// 恢复默认
 	restoreDefault() {
@@ -283,19 +264,22 @@ class ImageData {
 		this.outputPercent = 0
 		this.outputStatus = OutputStatusEnum.NO
 	}
+
+	// 释放占用的 objectURL，移除文件时调用，避免内存泄漏
+	dispose() {
+		if (this.perUrl) URL.revokeObjectURL(this.perUrl)
+		if (this.outerUrl) URL.revokeObjectURL(this.outerUrl)
+		this.outerUrl = null
+	}
 }
 
-
-
-
-
 // 转换成 ArrayBuffer
-function blobToArrayBuffer(blob: Blob) {
+function blobToArrayBuffer(blob: Blob): Promise<ArrayBuffer | null> {
 	return new Promise((resolve) => {
 		const reader = new FileReader()
 		reader.readAsArrayBuffer(blob)
 		reader.onload = () => {
-			resolve(reader.result)
+			resolve(reader.result as ArrayBuffer)
 		}
 		reader.onerror = () => {
 			resolve(null)

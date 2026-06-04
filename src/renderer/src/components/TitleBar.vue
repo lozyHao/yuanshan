@@ -6,7 +6,9 @@ import {
 	QuestionCircle24Regular,
 	Star24Regular,
 	Toolbox24Filled,
-	DrawText20Filled
+	DrawText20Filled,
+	ArrowDownload24Regular,
+	ArrowUpload24Regular
 } from '@vicons/fluent'
 import { ClearOutlined } from '@vicons/antd'
 import { FormatColorTextRound } from '@vicons/material'
@@ -18,6 +20,8 @@ import { useThemeStore } from '@renderer/store/theme'
 import { useOptionBasicStore } from '@renderer/store/optionBasic'
 import { useOptionTextStore } from '@renderer/store/optionText'
 import { useOptionLensStore } from '@renderer/store/optionLens'
+
+import { useConfigIO } from '@renderer/hooks/useConfigIO'
 
 import PopCanvasSign from './PopCanvasSign.vue'
 import PopDrawingBoard from './PopDrawingBoard.vue'
@@ -93,6 +97,35 @@ const onClear = () => {
 		}
 	}
 	message.success('恢复成功')
+}
+
+// 配置导入/导出/应用统一入口
+const { exportConfig, importConfigFile } = useConfigIO()
+
+// 导出配置（基础配置 + 文字模板 + 相机参数，整合为单个 JSON 文件）
+const onExportConfig = () => {
+	exportConfig()
+	message.success('配置已导出')
+}
+
+// 导入配置
+const configInputRef = ref<HTMLInputElement | null>(null)
+const onImportConfigClick = () => {
+	configInputRef.value?.click()
+}
+const onImportConfigChange = async (e: Event) => {
+	const input = e.target as HTMLInputElement
+	const file = input.files?.[0]
+	if (!file) return
+	try {
+		await importConfigFile(file)
+		message.success('配置导入成功')
+	} catch (err) {
+		message.error(err instanceof Error ? err.message : '导入失败')
+	} finally {
+		// 允许重复选择同一文件
+		input.value = ''
+	}
 }
 
 // 字体转图片
@@ -230,6 +263,24 @@ onMounted(() => {
 						</div>
 						<span class="color3 pl-2">切换主题</span>
 					</div>
+					<div class="menu-hover flex items-center p-1 rounded-md transition-colors cursor-pointer"
+						@click="onExportConfig">
+						<div class="w-8 h-8 flex items-center justify-center">
+							<n-icon size="24" class="color3">
+								<ArrowDownload24Regular />
+							</n-icon>
+						</div>
+						<span class="color3 pl-2">导出配置</span>
+					</div>
+					<div class="menu-hover flex items-center p-1 rounded-md transition-colors cursor-pointer"
+						@click="onImportConfigClick">
+						<div class="w-8 h-8 flex items-center justify-center">
+							<n-icon size="24" class="color3">
+								<ArrowUpload24Regular />
+							</n-icon>
+						</div>
+						<span class="color3 pl-2">导入配置</span>
+					</div>
 					<n-popover trigger="hover" placement="left-start" :show-arrow="false">
 						<template #trigger>
 							<div class="menu-hover flex items-center p-1 rounded-md transition-colors cursor-pointer">
@@ -243,12 +294,13 @@ onMounted(() => {
 						</template>
 						<img class="w-50 h-50 rounded-lg" src="@renderer/assets/images/support_me.png" alt="">
 					</n-popover>
-
 				</div>
 			</n-popover>
 		</div>
 		<pop-canvas-sign v-model:show="canvasSignPopShow"></pop-canvas-sign>
 		<pop-drawing-board v-model:show="drawingBoardPopShow"></pop-drawing-board>
+		<input ref="configInputRef" type="file" accept="application/json,.json" class="hidden"
+			@change="onImportConfigChange" />
 	</div>
 </template>
 

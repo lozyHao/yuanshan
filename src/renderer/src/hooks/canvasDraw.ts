@@ -123,14 +123,11 @@ class CanvasDraw {
 		this.borderSize = borderSize
 		this.haveText = haveText
 
-		console.log("边框：", borderWidth, borderSize, "图片：", width, height)
 		this.width = width + this.minSize * ((borderWidth[1] + borderWidth[3]) / 100)
 		this.height = height + this.minSize * ((borderWidth[0] + borderWidth[2]) / 100)
 		if (haveText) {
 			this.height += this.minSize * (borderSize / 100)
 		}
-
-		console.log("输出大小：", this.width, this.height)
 
 		this.canvas = new OffscreenCanvas(this.width, this.height)
 		this.ctx = this.canvas.getContext('2d') as OffscreenCanvasRenderingContext2D
@@ -176,7 +173,6 @@ class CanvasDraw {
 		} = options
 		this.ctx.save()
 		this.ctx.fillStyle = color
-		console.log('绘制的字体', font)
 		this.ctx.font = `${italic ? 'italic ' : ''} ${bold ? 'bold' : ''} ${size}px ${font}`
 		this.ctx.textAlign = textAlign
 		this.ctx.textBaseline = 'middle'
@@ -485,8 +481,8 @@ class CanvasDraw {
 	/**
 	 * 获取canvas blob
 	 */
-	async getBlob(params: { type?: string; quality?: number }) {
-		const { type = 'image/jpg', quality = 0.9 } = params
+	async getBlob(params: { type?: string; quality?: number } = {}) {
+		const { type = 'image/jpeg', quality = 0.9 } = params
 		return await this.canvas.convertToBlob({ type, quality })
 	}
 

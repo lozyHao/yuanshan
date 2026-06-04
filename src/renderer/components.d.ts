@@ -50,6 +50,7 @@ declare module 'vue' {
     PopDrawingBoard: typeof import('./src/components/PopDrawingBoard.vue')['default']
     PopLensEdit: typeof import('./src/components/PopLensEdit.vue')['default']
     PopOutput: typeof import('./src/components/PopOutput.vue')['default']
+    PopTemplate: typeof import('./src/components/PopTemplate.vue')['default']
     PopTextTemplateEdit: typeof import('./src/components/PopTextTemplateEdit.vue')['default']
     TitleBar: typeof import('./src/components/TitleBar.vue')['default']
     UploadFile: typeof import('./src/components/UploadFile.vue')['default']

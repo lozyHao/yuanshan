@@ -1,7 +1,7 @@
 /**
  * 通用配置
  */
-import { defineStore } from 'pinia'
+import { acceptHMRUpdate, defineStore } from 'pinia'
 import { ref } from 'vue'
 import {
 	OptionTextTemplateValues,
@@ -127,6 +127,25 @@ export const useOptionTextStore = defineStore(
 			_data.value = _data.value.filter((item: OptionTextTemplateValues) => item.key !== key)
 		}
 
+		// 整体导入文字模板（含中线位置）
+		const setAll = (
+			templates: OptionTextTemplateValues[],
+			positions?: {
+				header?: [number, number, number]
+				middle?: [number, number, number]
+				footer?: [number, number, number]
+			}
+		) => {
+			if (Array.isArray(templates)) {
+				_data.value = [...templates]
+			}
+			if (positions) {
+				if (positions.header) textPositionsHeader.value = positions.header
+				if (positions.middle) textPositionsMiddle.value = positions.middle
+				if (positions.footer) textPositionsFooter.value = positions.footer
+			}
+		}
+
 		// 恢复默认
 		const reset = () => {
 			_data.value = [...defTextTemps]
@@ -181,6 +200,7 @@ export const useOptionTextStore = defineStore(
 			remove,
 			edit,
 			del,
+			setAll,
 			reset,
 			textPositionsHeader,
 			textPositionsMiddle,
@@ -197,3 +217,8 @@ export const useOptionTextStore = defineStore(
 		}
 	}
 )
+
+// 支持 HMR：修改本 store 文件后热更新会替换实例，避免出现旧实例方法缺失
+if (import.meta.hot) {
+	import.meta.hot.accept(acceptHMRUpdate(useOptionTextStore, import.meta.hot))
+}

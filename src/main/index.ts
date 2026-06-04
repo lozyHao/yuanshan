@@ -1,14 +1,11 @@
 import { app, shell, BrowserWindow, ipcMain, protocol } from 'electron'
-import { join } from 'path'
+import { join, normalize, relative, isAbsolute } from 'path'
 import { promises as fs } from 'fs'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 
 import start from './eventHandler'
 
 import icon from '../../resources/icon.png?asset'
-
-// 禁用安全警告
-process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
 
 // 注册自定义协议方案
 protocol.registerSchemesAsPrivileged([
@@ -18,14 +15,12 @@ protocol.registerSchemesAsPrivileged([
 			secure: true,
 			supportFetchAPI: true,
 			standard: true,
-			bypassCSP: true,
 			stream: true
 		}
 	}
 ])
 
 function createWindow(): void {
-	console.log('createWindow')
 	// 创建浏览器窗口
 	const mainWindow: BrowserWindow = new BrowserWindow({
 		width: 1080,
@@ -43,13 +38,11 @@ function createWindow(): void {
 		...(process.platform === 'linux' ? { icon } : {}),
 		webPreferences: {
 			preload: join(__dirname, '../preload/index.js'),
-			sandbox: false,
-			webSecurity: false // 允许跨域
+			sandbox: false
 		}
 	})
 
 	mainWindow.on('ready-to-show', () => {
-		console.log('ready-to-show')
 		mainWindow.show()
 	})
 
@@ -69,10 +62,19 @@ function createWindow(): void {
 	}
 }
 
+// 应用临时目录（图片打开时复制到这里）
+const getTempBaseDir = (): string => normalize(join(app.getPath('appData'), 'yuanshan'))
+
 // 应用启动时
-app.whenReady().then(() => {
-	console.log('app.whenReady')
+app.whenReady().then(async () => {
 	electronApp.setAppUserModelId('com.lozyhao')
+
+	// 清理上次运行残留的临时文件，避免磁盘无限增长
+	try {
+		await fs.rm(join(getTempBaseDir(), 'temp'), { recursive: true, force: true })
+	} catch {
+		// 清理失败不影响启动
+	}
 
 	app.on('browser-window-created', (_, window) => {
 		optimizer.watchWindowShortcuts(window)
@@ -83,13 +85,6 @@ app.whenReady().then(() => {
 	// 创建窗口
 	createWindow()
 
-	setTimeout(() => {
-		const mainWindow = BrowserWindow.getAllWindows()[0];
-		if (mainWindow) {
-			mainWindow.show();
-		}
-	}, 2000);
-
 	// 启动自定义事件监听
 	start()
 
@@ -97,30 +92,32 @@ app.whenReady().then(() => {
 		if (BrowserWindow.getAllWindows().length === 0) createWindow()
 	})
 
-	//   启用自定义协议
+	// 启用自定义协议：仅允许读取应用临时目录内的文件，防止任意文件读取（路径穿越）
 	protocol.handle('local-yuanshan', async (request) => {
-		// 解码 URL
-		console.log('request.url', request.url)
-		const decodedUrl = decodeURIComponent(
-			request.url
-				.replace(new RegExp('^local-yuanshan://', 'i'), '')
-				.replace(/^([a-z]):?\/?/i, (match) => {
-					const letter = match.charAt(0).toUpperCase() + ':'
-					return `${letter}/`
-				})
-		)
-		console.log('decodedUrl:', decodedUrl)
+		try {
+			const decodedUrl = decodeURIComponent(
+				request.url
+					.replace(new RegExp('^local-yuanshan://', 'i'), '')
+					.replace(/^([a-z]):?\/?/i, (match) => {
+						const letter = match.charAt(0).toUpperCase() + ':'
+						return `${letter}/`
+					})
+			)
 
-		// 拼接完整的文件路径
-		const fullPath = process.platform === 'win32' ? join(decodedUrl) : decodedUrl
-		console.log('fullPath:', fullPath)
+			const fullPath = normalize(decodedUrl)
 
-		// 读取文件
-		const data = await fs.readFile(fullPath)
-		console.log('data:', data)
+			// 路径白名单校验：解析后的路径必须位于应用临时目录内
+			const baseDir = getTempBaseDir()
+			const rel = relative(baseDir, fullPath)
+			if (rel.startsWith('..') || isAbsolute(rel)) {
+				return new Response('Forbidden', { status: 403 })
+			}
 
-		// 返回文件
-		return new Response(data)
+			const data = await fs.readFile(fullPath)
+			return new Response(data)
+		} catch {
+			return new Response('Not Found', { status: 404 })
+		}
 	})
 })
 

@@ -8,6 +8,7 @@ import {
 import { CloudUpload } from "@vicons/tabler";
 
 import { computed, ref, onMounted } from "vue";
+import { watchDebounced } from "@vueuse/core";
 import { useMessage, useDialog } from "naive-ui";
 
 import ImageData from "@renderer/hooks/imageData";
@@ -96,6 +97,25 @@ const onStart = () => {
 	});
 };
 
+// 参数变化后实时刷新预览（防抖），无需手动点按钮
+watchDebounced(
+	() => [
+		basicStore._data,
+		textStore._data,
+		lensStore._data,
+		headerTextPosition.value,
+		middleTextPosition.value,
+		footerTextPosition.value,
+		index.value,
+		fileList.value.length
+	],
+	() => {
+		if (fileList.value.length === 0) return;
+		onStart();
+	},
+	{ deep: true, debounce: 250, maxWait: 1200 }
+);
+
 // 开始输出
 const outputPopShow = ref<boolean>(false);
 const onOutput = () => {
@@ -148,7 +168,7 @@ onMounted(async () => {
 
 <template>
 	<div class="work-space w-full h-full flex">
-		<div class="bg-color16 w-80 h-full pt-[10px] overflow-y-auto shadow-xl">
+		<div class="bg-color16 w-90 h-full pt-[10px] overflow-y-auto shadow-xl">
 			<!-- 配置 -->
 			<options />
 		</div>
