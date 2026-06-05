@@ -111,7 +111,7 @@ watchDebounced(
 		if (fileList.value.length === 0) return;
 		onStart();
 	},
-	{ deep: true, debounce: 250, maxWait: 1200 }
+	{ deep: true, debounce: 1000, maxWait: 1500 }
 );
 
 // 开始输出
@@ -143,13 +143,11 @@ onMounted(async () => {
 		</div>
 		<div class="space-box bg-color15 relative flex flex-col">
 			<!-- 顶部导航 -->
-			<div
-				class="flex-end bg-color16 border-color15 h-10 border-b-1 border-b-solid border-l-1 border-l-solid pr-4">
+			<div class="flex-end bg-color16 border-color15 h-10 border-b-1 border-b-solid border-l-1 border-l-solid pr-4">
 				<n-space size="small">
 					<n-popover trigger="hover" :show-arrow="false" :disabled="fileList.length === 0">
 						<template #trigger>
-							<n-button class="h-8 w-8" quaternary type="warning" :disabled="fileList.length === 0"
-								@click="onClearAll">
+							<n-button class="h-8 w-8" quaternary type="warning" :disabled="fileList.length === 0" @click="onClearAll">
 								<template #icon>
 									<n-icon class="color-warning" :size="20" :component="Delete24Filled" />
 								</template>
@@ -159,8 +157,7 @@ onMounted(async () => {
 					</n-popover>
 					<n-popover trigger="hover" :show-arrow="false">
 						<template #trigger>
-							<n-button class="h-8 w-8" quaternary type="info" :disabled="fileList.length === 0"
-								@click="onOutput">
+							<n-button class="h-8 w-8" quaternary type="info" :disabled="fileList.length === 0" @click="onOutput">
 								<template #icon>
 									<n-icon class="color-info" :size="20" :component="Play24Filled" />
 								</template>
@@ -175,16 +172,15 @@ onMounted(async () => {
 			<div class="space default-layout w-full flex-1 overflow-y-auto flex-center flex-col relative">
 				<!-- 文件上传 -->
 				<div v-if="fileList.length === 0"
-					class="upload bg-color16 w-full max-w-200 aspect-video flex-center rounded-xl flex-col cursor-pointer relative transition-all hover:shadow-xl relative">
+					class="upload bg-color16 w-full h-full max-w-140 max-h-80 aspect-video flex-center rounded-xl flex-col cursor-pointer relative transition-all hover:shadow-xl relative">
 					<n-icon class="color6 mb-2" size="48" :component="CloudUpload" />
 					<n-text style="font-size: 16px">
 						点击或者拖动文件到该区域来上传
 					</n-text>
 					<input class="absolute top-0 left-0 w-full h-full cursor-pointer opacity-0" type="file" multiple
 						accept="image/jpg,image/jpeg,image/png" @change="handleFileChange">
-					<n-spin v-show="preLoading"
-						class="bg-opacity3-000 rounded-xl absolute top-0 left-0 z-10 w-full h-full" type="spinner"
-						size="large" />
+					<n-spin v-show="preLoading" class="bg-opacity3-000 rounded-xl absolute top-0 left-0 z-10 w-full h-full"
+						type="spinner" size="large" />
 				</div>
 
 				<div v-if="fileList.length > 0" class="w-full flex-1 min-h-0 flex-center overflow-hidden">
@@ -193,11 +189,11 @@ onMounted(async () => {
 				<div class="color9 absolute bottom-3 right-3">
 					文件数 {{ fileList.length }} / 当前 {{ index + 1 }}
 				</div>
-				<div v-if="loading"
+				<!-- <div v-if="loading"
 					class="progress bg-color-info flex-center h-3 absolute bottom-[1px] transition-all text-[8px] text-#fff"
 					:style="{ width: progress + '%' }">
 					{{ progress }}%
-				</div>
+				</div> -->
 			</div>
 			<!-- 底部图片目录 -->
 			<div class="bottom_bar flex-center flex-wrap w-full h-auto transition-all">

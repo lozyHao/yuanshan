@@ -94,11 +94,12 @@ class ExifFactory {
 		}
 		if (key === 'Model') {
 			const make = (this.exif['Make'] || '').toUpperCase()
-			const firstToken = data.split(' ')[0]
-			let result = data
+			const model = data.trim()
+			const firstToken = model.split(' ')[0]
+			let result = model
 			// 仅当型号开头确实是品牌名时才去掉品牌前缀，避免误删型号本身（如富士 X-T5、索尼 ZV-E10）
 			if (firstToken && make.includes(firstToken.toUpperCase())) {
-				result = data.slice(firstToken.length).trimStart()
+				result = model.slice(firstToken.length).trimStart()
 			}
 			// 下划线转间隔点：Z 6_2 => Z 6·2
 			result = result.replace(/_/g, '·')
