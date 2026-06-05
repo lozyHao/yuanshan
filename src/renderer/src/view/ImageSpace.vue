@@ -2,8 +2,6 @@
 import {
 	Play24Filled,
 	Delete24Filled,
-	Copy24Regular,
-	Clipboard24Regular,
 } from "@vicons/fluent";
 import { CloudUpload } from "@vicons/tabler";
 
@@ -20,12 +18,10 @@ import { useOptionLensStore } from "@renderer/store/optionLens";
 import { TextTemplatePositionEnum } from "@renderer/interfaces/options"
 import { fontOptions } from "@renderer/default/font-options";
 import { loadFont } from "@renderer/utils/tool";
-import { ExifData } from "@renderer/hooks/exifFactory";
 
 import Options from "./components/Options.vue";
 import PreImage from "./components/PreImage.vue";
 import PreList from "./components/PreList.vue";
-import ImageDetail from "@renderer/components/ImageDetail.vue";
 import PopOutput from "@renderer/components/PopOutput.vue";
 
 const store = useFileStore();
@@ -107,7 +103,9 @@ watchDebounced(
 		middleTextPosition.value,
 		footerTextPosition.value,
 		index.value,
-		fileList.value.length
+		fileList.value.length,
+		// 当前照片的 exif（详情面板手动编辑后也实时刷新预览）
+		fileList.value[index.value]?.exif?.exif
 	],
 	() => {
 		if (fileList.value.length === 0) return;
@@ -124,35 +122,6 @@ const onOutput = () => {
 		return
 	}
 	outputPopShow.value = true;
-};
-
-// 复制exif报告数据
-const onCopy = () => {
-	const jsonData = JSON.stringify(store._imageData[index.value]?.exif.exif);
-	const formattedData = JSON.stringify(JSON.parse(jsonData), null, 2); // 使用 2 个空格缩进进行格式化
-	navigator.clipboard
-		.writeText(formattedData)
-		.then(() => {
-			message.success("复制成功");
-		})
-		.catch(() => {
-			message.error("复制失败");
-		});
-};
-
-// 弹窗展示详细图片和exif信息列表，并可canvas截图导出
-const currentImageExif = ref<ExifData>({});
-const currentImage = ref<string>("");
-const showImageInfo = ref(false);
-const onShowImageInfo = () => {
-	currentImageExif.value = store._imageData[index.value]?.exif.exif;
-	currentImage.value = store._imageData[index.value]?.perUrl;
-
-	if (currentImageExif.value) {
-		showImageInfo.value = true;
-		return;
-	}
-	message.error("照片exif信息未加载完成");
 };
 
 // 初始化加载字体
@@ -203,7 +172,7 @@ onMounted(async () => {
 				</n-space>
 			</div>
 			<!-- 工作区 -->
-			<div class="space default-layout w-full flex-1 p-4 overflow-y-auto flex-center flex-col relative">
+			<div class="space default-layout w-full flex-1 overflow-y-auto flex-center flex-col relative">
 				<!-- 文件上传 -->
 				<div v-if="fileList.length === 0"
 					class="upload bg-color16 w-full max-w-200 aspect-video flex-center rounded-xl flex-col cursor-pointer relative transition-all hover:shadow-xl relative">
@@ -218,44 +187,8 @@ onMounted(async () => {
 						size="large" />
 				</div>
 
-				<div v-if="fileList.length > 0" class="flex-center" style="max-height: calc(100% - 48px)">
-					<pre-image v-if="fileList.length > 0" />
-				</div>
-				<div v-if="fileList.length > 0" class="flex-center w-full h-10 mt-2">
-					<!-- 控件 -->
-					<n-space size="small" align="center">
-						<n-popover trigger="hover" :show-arrow="false">
-							<template #trigger>
-								<n-button strong secondary circle type="info" size="small" @click="onShowImageInfo">
-									<template #icon>
-										<n-icon :component="Clipboard24Regular" />
-									</template>
-								</n-button>
-							</template>
-							<span>报告预览</span>
-						</n-popover>
-						<n-popover trigger="hover" :show-arrow="false">
-							<template #trigger>
-								<n-button strong secondary circle type="info" size="small" @click="onCopy">
-									<template #icon>
-										<n-icon :component="Copy24Regular" />
-									</template>
-								</n-button>
-							</template>
-							<span>复制参数</span>
-						</n-popover>
-						<n-popover trigger="hover" :show-arrow="false">
-							<template #trigger>
-								<n-button strong secondary circle type="info" size="large" :loading="loading"
-									@click="onStart">
-									<template #icon>
-										<n-icon :component="Play24Filled" />
-									</template>
-								</n-button>
-							</template>
-							<span>[开始/刷新] 预览</span>
-						</n-popover>
-					</n-space>
+				<div v-if="fileList.length > 0" class="w-full flex-1 min-h-0 flex-center overflow-hidden">
+					<pre-image />
 				</div>
 				<div class="color9 absolute bottom-3 right-3">
 					文件数 {{ fileList.length }} / 当前 {{ index + 1 }}
@@ -275,7 +208,6 @@ onMounted(async () => {
 				</transition>
 			</div>
 		</div>
-		<image-detail v-model:show="showImageInfo" :exif="currentImageExif" :image="currentImage" />
 		<!-- 开始输出弹窗 -->
 		<pop-output v-model:show="outputPopShow"></pop-output>
 	</div>

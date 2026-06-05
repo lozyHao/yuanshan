@@ -9,7 +9,6 @@ declare module 'vue' {
   export interface GlobalComponents {
     CameraSelect: typeof import('./src/components/CameraSelect.vue')['default']
     FontSelect: typeof import('./src/components/FontSelect.vue')['default']
-    ImageDetail: typeof import('./src/components/ImageDetail.vue')['default']
     MustText: typeof import('./src/components/MustText.vue')['default']
     NButton: typeof import('naive-ui')['NButton']
     NCheckbox: typeof import('naive-ui')['NCheckbox']
@@ -50,7 +49,6 @@ declare module 'vue' {
     PopDrawingBoard: typeof import('./src/components/PopDrawingBoard.vue')['default']
     PopLensEdit: typeof import('./src/components/PopLensEdit.vue')['default']
     PopOutput: typeof import('./src/components/PopOutput.vue')['default']
-    PopTemplate: typeof import('./src/components/PopTemplate.vue')['default']
     PopTextTemplateEdit: typeof import('./src/components/PopTextTemplateEdit.vue')['default']
     TitleBar: typeof import('./src/components/TitleBar.vue')['default']
     UploadFile: typeof import('./src/components/UploadFile.vue')['default']
