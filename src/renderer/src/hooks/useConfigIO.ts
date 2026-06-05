@@ -1,6 +1,7 @@
 import { useOptionBasicStore } from '@renderer/store/optionBasic'
 import { useOptionTextStore } from '@renderer/store/optionText'
 import { useOptionLensStore } from '@renderer/store/optionLens'
+import { useFileStore } from '@renderer/store/file'
 import {
 	buildConfig,
 	downloadConfig,
@@ -17,6 +18,7 @@ export function useConfigIO() {
 	const basicStore = useOptionBasicStore()
 	const textStore = useOptionTextStore()
 	const lensStore = useOptionLensStore()
+	const fileStore = useFileStore()
 
 	// 汇总当前配置（基础 + 文字模板含中线位置 + 相机参数）
 	const collectConfig = (): YuanshanConfig => {
@@ -45,6 +47,8 @@ export function useConfigIO() {
 		if (cloned.basic) basicStore.setAll(cloned.basic)
 		if (cloned.text?.templates) textStore.setAll(cloned.text.templates, cloned.text.textPositions)
 		if (cloned.lens) lensStore.setAll(cloned.lens)
+		// 应用后主动刷新预览，保证模板应用/配置导入一定触发实时更新
+		fileStore.refreshPreview()
 	}
 
 	// 从文件导入并应用

@@ -1,11 +1,13 @@
 <!-- 预览模式下，图片预览效果（支持缩放/拖拽） -->
 <script setup lang="ts">
-import { ZoomIn24Regular, ZoomOut24Regular, ArrowReset24Regular } from '@vicons/fluent'
+import { ZoomIn24Regular, ZoomOut24Regular, ArrowReset24Regular, ArrowSync24Regular } from '@vicons/fluent'
 
 import { useFileStore } from '@renderer/store/file'
 import { computed, ref, watch } from 'vue'
 
 import ImageData from '@renderer/hooks/imageData'
+
+const emit = defineEmits(['refresh'])
 
 const store = useFileStore()
 
@@ -96,14 +98,19 @@ const onUp = () => {
 
 		<!-- 缩放控件 -->
 		<div
-			class="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-white/40 rounded-full px-2 py-1 shadow-md"
+			class="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-white/40 rounded-full px-1 py-1 shadow-md"
 			@mousedown.stop @wheel.stop>
-			<n-button quaternary circle size="small" @click="zoomOut">
+			<n-button type="primary" circle size="small" title="刷新预览" @click="emit('refresh')">
+				<template #icon>
+					<n-icon :component="ArrowSync24Regular" />
+				</template>
+			</n-button>
+			<n-button quaternary circle size="small" title="缩小" @click="zoomOut">
 				<template #icon>
 					<n-icon :component="ZoomOut24Regular" />
 				</template>
 			</n-button>
-			<span class="text-xs color6 w-12 text-center cursor-pointer select-none" title="还原" @click="reset">
+			<span class="text-xs color6 text-center cursor-pointer select-none" title="还原" @click="reset">
 				{{ Math.round(scale * 100) }}%
 			</span>
 			<n-button quaternary circle size="small" @click="zoomIn">

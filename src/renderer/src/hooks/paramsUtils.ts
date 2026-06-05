@@ -108,11 +108,6 @@ const getTemplate = async (
 					data.font = len.font as string
 				}
 
-				// 规范化文本：去除首尾空白，避免前导/尾随空格导致 canvas 测量与绘制错位（如 " Z 8" 只显示 "8"）
-				if (typeof data.content === 'string') {
-					data.content = data.content.trim()
-				}
-
 				arr.push(data)
 			}
 

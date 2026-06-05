@@ -81,46 +81,28 @@ class ExifFactory {
 	// 获取对应的数据
 	get(key: string) {
 		const data = this.exif[key]
-		// 源头拦截：值缺失时直接返回 null，避免被前缀/拼接成 "ISOnull"、"NaN" 等再绘制上去
+		// 值缺失时返回 null，避免被拼接成 "ISOnull" 等再绘制上去
 		if (data === null || data === undefined || data === '') {
 			return null
 		}
 		if (key === 'Image Height' || key === 'Image Width') {
 			return Number(data?.replace('px', ''))
 		}
-		if (key === 'Make') {
-			// 去掉第一个空格之后的内容 NIKON CORPORATION => NIKON
-			return data?.split(' ')[0]
-		}
 		if (key === 'Model') {
 			const make = (this.exif['Make'] || '').toUpperCase()
-			const model = data.trim()
-			const firstToken = model.split(' ')[0]
-			let result = model
-			// 仅当型号开头确实是品牌名时才去掉品牌前缀，避免误删型号本身（如富士 X-T5、索尼 ZV-E10）
-			if (firstToken && make.includes(firstToken.toUpperCase())) {
-				result = model.slice(firstToken.length).trimStart()
-			}
-			// 下划线转间隔点：Z 6_2 => Z 6·2
-			result = result.replace(/_/g, '·')
-			// 尼康 Z 系列风格化——仅对尼康生效，不影响其它品牌型号中的 Z
-			if (make.includes('NIKON')) {
+			// 保留型号原文（不去除品牌前缀），仅做风格化处理
+			let result = data.trim()
+			// 尼康 Z 系列风格化（Z => ℤ）——尼康机型才生效，避免影响其它品牌型号中的 Z
+			if (make.includes('NIKON') || result.toUpperCase().includes('NIKON')) {
 				result = result.replace(/[Zz]/g, 'ℤ')
 			}
 			return result
 		}
-		if (key === 'FocalLength') {
-			// 去掉空格 56 mm => 56mm
-			return data?.replace(' ', '')
-		}
+		// 仅 ISO 加前缀：100 => ISO100
 		if (key === 'ISOSpeedRatings') {
-			// 100 => ISO100
 			return `ISO${data}`
 		}
-		if (key === 'LensModel') {
-			// 去除镜头厂商
-			return data?.replace(data?.split(' ')[0] + ' ', '')
-		}
+		// 其余字段原样返回
 		return data
 	}
 }

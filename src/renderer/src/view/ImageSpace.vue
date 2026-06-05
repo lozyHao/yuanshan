@@ -184,9 +184,9 @@ onMounted(async () => {
 				</div>
 
 				<div v-if="fileList.length > 0" class="w-full flex-1 min-h-0 flex-center overflow-hidden">
-					<pre-image />
+					<pre-image @refresh="onStart" />
 				</div>
-				<div class="color9 absolute bottom-3 right-3">
+				<div class="color9 absolute bottom-3 right-3 text-3 font-bold">
 					文件数 {{ fileList.length }} / 当前 {{ index + 1 }}
 				</div>
 				<!-- <div v-if="loading"

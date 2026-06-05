@@ -11,7 +11,12 @@ import {
 	OptionTextTemplateValues,
 	OptionLensValues,
 	TextPositionValues,
+	TextTemplatePositionEnum,
 } from "@renderer/interfaces/options";
+
+import { useOptionBasicStore } from "@renderer/store/optionBasic";
+import { useOptionTextStore } from "@renderer/store/optionText";
+import { useOptionLensStore } from "@renderer/store/optionLens";
 
 import FileWorker from "@renderer/hooks/fileWorker.ts?worker";
 
@@ -95,6 +100,25 @@ export const useFileStore = defineStore("file", () => {
 		_imageData.value[_currentPreIndex.value].onPrint(data, textPosition);
 	};
 
+	// 主动刷新当前预览：自动从各 option store 组装参数后重绘。
+	// 用于模板应用、配置导入、详情重置等离散动作，保证一定触发实时更新。
+	const refreshPreview = async () => {
+		if (fileLength.value === 0) return;
+		const basicStore = useOptionBasicStore();
+		const textStore = useOptionTextStore();
+		const lensStore = useOptionLensStore();
+		await startPreview({
+			basic: basicStore._data,
+			text: textStore._data,
+			lens: lensStore._data,
+			textPosition: {
+				headerTextPosition: textStore.getTextPosition(TextTemplatePositionEnum.HEADER),
+				middleTextPosition: textStore.getTextPosition(TextTemplatePositionEnum.MIDDLE),
+				footerTextPosition: textStore.getTextPosition(TextTemplatePositionEnum.FOOTER),
+			},
+		});
+	};
+
 	// 开始输出
 	const startOutput = async (options: {
 		basic: OptionBasicValues;
@@ -159,6 +183,7 @@ export const useFileStore = defineStore("file", () => {
 		removeFile,
 		getFile,
 		startPreview,
+		refreshPreview,
 		startOutput,
 		reset,
 		setCurrentPreIndex,
