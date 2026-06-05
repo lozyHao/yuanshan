@@ -39,7 +39,10 @@
 
 ### 主界面
 
-<img src="./static/0-主界面.png" height="300" />
+<img src="./static/0-主界面1.png" height="300" />
+<img src="./static/0-主界面2.png" height="300" />
+<img src="./static/0-主界面3.png" height="300" />
+<img src="./static/0-主界面4.png" height="300" />
 
 ## 网友投稿
 
