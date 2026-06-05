@@ -22,7 +22,7 @@ const openFile = async () => {
 		message.warning("请选择文件夹");
 		return
 	}
-	await (window.api as any).openFileDirectoryByPath(props.dir)
+	window.api.openFileDirectoryByPath(props.dir)
 }
 </script>
 

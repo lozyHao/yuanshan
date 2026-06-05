@@ -42,10 +42,9 @@ const emits = defineEmits(['onChange'])
 // 点击选择文件
 const openFile = async () => {
 	if (props.fileType === 'file') {
-		const result = await (window.api as any).openFile()
+		const result = await window.api.openFile()
 		const { msg, status, fileDir } = result
-		console.log(result)
-		if (!status) {
+		if (!status || !fileDir || fileDir.length === 0) {
 			message.error(msg)
 			return
 		}
@@ -54,7 +53,7 @@ const openFile = async () => {
 	}
 
 	if (props.fileType === 'directory') {
-		const filePath = await (window.api as any).openFileDirectory()
+		const filePath = await window.api.openFileDirectory()
 		if (!filePath) return
 		emits('onChange', filePath[0])
 		return

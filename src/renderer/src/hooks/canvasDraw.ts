@@ -219,37 +219,22 @@ class CanvasDraw {
 	drawBlurImage(options: BlurImageType) {
 		const { image, width = this.width, height = this.height, x = 0, y = 0, blur = 60 } = options
 
-		// 保存原始上下文状态
-		this.ctx.save();
-		// 预填充背景色（关键步骤）
-		this.ctx.fillStyle = "#FFFFFF"; // 根据实际背景色修改
-		this.ctx.fillRect(x, y, width, height);
-		// 扩展绘制区域（模糊补偿）
+		this.ctx.save()
 
-		// 扩大绘制范围（坐标偏移 + 尺寸扩展）
-		for (let i = 3; i >0; i--) {
-			const blurCompensation = blur * (i * 2); // 模糊扩散补偿量
-			this.ctx.filter = `blur(${blur}px)`;
-			this.ctx.drawImage(
-				image,
-				x - blurCompensation / 2,          // X 偏移补偿
-				y - blurCompensation / 2,          // Y 偏移补偿
-				width + blurCompensation,        // 绘制宽度扩展
-				height + blurCompensation        // 绘制高度扩展
-			);
-		}
-		this.ctx.filter = `blur(${blur}px)`;
-		this.ctx.drawImage(
-			image,
-			x - blur / 2,          // X 偏移补偿
-			y - blur / 2,          // Y 偏移补偿
-			width + blur,        // 绘制宽度扩展
-			height + blur        // 绘制高度扩展
-		);
-		this.ctx.filter = 'none';
+		// 1) 裁剪到目标区域：超出部分（被模糊晕开的边缘）会被裁掉，不会露出背景
+		this.ctx.beginPath()
+		this.ctx.rect(x, y, width, height)
+		this.ctx.clip()
 
-		// 恢复上下文状态
-		this.ctx.restore();
+		// 2) 过扫描绘制：将图片向四周各扩展 2*blur 再绘制。
+		//    被模糊晕开、本会出现白边/透明边的部分被推到裁剪区之外，
+		//    因此一次绘制即可消除白边，无需多次叠加。
+		const pad = Math.ceil(blur * 2)
+		this.ctx.filter = `blur(${blur}px)`
+		this.ctx.drawImage(image, x - pad, y - pad, width + pad * 2, height + pad * 2)
+		this.ctx.filter = 'none'
+
+		this.ctx.restore()
 	}
 
 	/**

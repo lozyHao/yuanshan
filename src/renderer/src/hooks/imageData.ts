@@ -147,7 +147,7 @@ class ImageData {
 					}
 
 					this.outputStatus = OutputStatusEnum.SAVE
-					const result = await (window.api as any).sendSaveFile({
+					const result = await window.api.sendSaveFile({
 						imageArrayBuffer: arrayBuffer,
 						dir: params.basic.outputPath,
 						outputFormat: message.outputFormat

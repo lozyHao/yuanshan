@@ -93,11 +93,20 @@ class ExifFactory {
 			return data?.split(' ')[0]
 		}
 		if (key === 'Model') {
-			// 去掉第一个空格之前的内容 NIKON Z 6_2 => Z 6_2
-			return data
-				?.replace(data?.split(' ')[0] + ' ', '')
-				.replace('_', '·')
-				.replace(/[Zz]/g, 'ℤ')
+			const make = (this.exif['Make'] || '').toUpperCase()
+			const firstToken = data.split(' ')[0]
+			let result = data
+			// 仅当型号开头确实是品牌名时才去掉品牌前缀，避免误删型号本身（如富士 X-T5、索尼 ZV-E10）
+			if (firstToken && make.includes(firstToken.toUpperCase())) {
+				result = data.slice(firstToken.length).trimStart()
+			}
+			// 下划线转间隔点：Z 6_2 => Z 6·2
+			result = result.replace(/_/g, '·')
+			// 尼康 Z 系列风格化——仅对尼康生效，不影响其它品牌型号中的 Z
+			if (make.includes('NIKON')) {
+				result = result.replace(/[Zz]/g, 'ℤ')
+			}
+			return result
 		}
 		if (key === 'FocalLength') {
 			// 去掉空格 56 mm => 56mm
